@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { StarRating } from '../components/StarRating'
@@ -14,51 +13,49 @@ export function ResultScreen() {
   const t = getTranslations(language)
 
   useEffect(() => {
-    if (rankedUp) {
-      soundEngine.playRankUp()
-    }
+    if (rankedUp) soundEngine.playRankUp()
   }, [rankedUp])
 
-  if (!lastResult) {
-    setPhase('hub')
-    return null
-  }
+  if (!lastResult) { setPhase('hub'); return null }
 
   const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions } = lastResult
 
-  const handlePlayAgain = () => {
-    if (currentWorldId) {
-      resetRound()
-      setPhase('hub')
-    }
-  }
-
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 py-6 overflow-y-auto">
-      {/* Rank-up banner */}
+    <div className="flex flex-col min-h-screen bg-op-ocean-dark overflow-y-auto">
+
+      {/* ── Rank-up overlay ── */}
       <AnimatePresence>
         {rankedUp && (
           <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="fixed inset-0 flex flex-col items-center justify-center bg-op-ocean-dark/95 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex flex-col items-center justify-center bg-op-ocean-dark z-50 px-8"
           >
             <motion.div
-              animate={{ rotate: [0, -5, 5, -5, 5, 0] }}
-              transition={{ duration: 0.5 }}
-              className="text-7xl mb-4"
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1], rotate: [0, -8, 8, 0] }}
+              transition={{ duration: 0.6, times: [0, 0.6, 0.8, 1] }}
+              className="text-8xl mb-6"
             >
               🏴‍☠️
             </motion.div>
-            <div className="font-title text-4xl text-op-gold text-center">{t.rankUp}</div>
-            <div className="font-body text-lg text-op-cyan mt-2">{t.newRank}</div>
-            <div className="font-title text-5xl text-op-gold mt-1">{newRankLabel}</div>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <div className="font-title text-5xl text-op-gold tracking-widest mb-1">{t.rankUp}</div>
+              <div className="font-body text-base text-white/60 mb-2">{t.newRank}</div>
+              <div className="font-title text-4xl text-op-cyan">{newRankLabel}</div>
+            </motion.div>
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
+              transition={{ delay: 1.8 }}
               onClick={() => useGameStore.setState({ rankedUp: false })}
-              className="mt-8 font-title text-2xl text-op-cyan border-2 border-op-cyan px-8 py-3 rounded-xl"
+              className="mt-10 font-title text-2xl text-op-gold border-4 border-op-gold px-10 py-3 rounded-2xl shadow-manga"
             >
               ▶ CONTINUE
             </motion.button>
@@ -66,118 +63,180 @@ export function ResultScreen() {
         )}
       </AnimatePresence>
 
-      <motion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="text-center mb-6"
-      >
-        <h1 className="font-title text-4xl text-op-gold">{t.roundComplete}</h1>
-        <div className="mt-3">
-          <StarRating correct={correctWords.length} total={totalQuestions} />
-        </div>
-      </motion.div>
-
-      {/* Score + berries */}
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="bg-op-parchment border-4 border-op-ink rounded-2xl shadow-manga p-5 mb-4 text-center"
-      >
-        <div className="font-title text-5xl text-op-ink">{score}</div>
-        <div className="font-body text-sm text-op-ink/60 mb-3">points</div>
-        <div className="flex justify-around">
-          <div>
-            <div className="font-title text-3xl text-op-gold">🍇 {berriesEarned}</div>
-            <div className="font-body text-xs text-op-ink/60">{t.berriesEarned}</div>
-          </div>
-          <div>
-            <div className="font-title text-3xl text-op-cyan">🔥 {maxStreak}</div>
-            <div className="font-body text-xs text-op-ink/60">Best streak</div>
-          </div>
-          <div>
-            <div className="font-title text-3xl text-op-green">✓ {correctWords.length}/{totalQuestions}</div>
-            <div className="font-body text-xs text-op-ink/60">Correct</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* New achievements */}
-      {newAchievements.length > 0 && (
+      {/* ── Hero header ── */}
+      <div className="relative bg-gradient-to-b from-[#0d2d4a] to-op-ocean-dark pt-10 pb-6 px-5 text-center">
         <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          <div className="text-6xl mb-3">🏴‍☠️</div>
+          <h1 className="font-title text-4xl text-op-gold tracking-widest">{t.roundComplete}</h1>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-op-gold/10 border-2 border-op-gold/40 rounded-xl p-4 mb-4"
+          className="mt-4"
         >
-          <div className="font-title text-xl text-op-gold mb-2">🏆 New Achievements!</div>
-          {newAchievements.map(id => {
-            const ach = ACHIEVEMENT_MAP[id]
-            if (!ach) return null
-            return (
-              <div key={id} className="flex items-center gap-2 mb-1">
-                <span className="text-2xl">{ach.icon}</span>
-                <span className="font-body text-sm text-op-gold">{ach.title}</span>
-              </div>
-            )
-          })}
+          <StarRating correct={correctWords.length} total={totalQuestions} />
         </motion.div>
-      )}
+      </div>
 
-      {/* Words learned */}
-      {correctWords.length > 0 && (
+      <div className="px-4 pb-8 flex flex-col gap-4">
+
+        {/* ── Score strip ── */}
         <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="bg-op-ink/20 border-2 border-op-green/30 rounded-xl p-4 mb-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-3 gap-3"
         >
-          <div className="font-title text-xl text-op-green mb-2">✓ {t.wordsLearned}</div>
-          <div className="grid grid-cols-2 gap-1">
-            {correctWords.map(w => (
-              <div key={w.en} className="font-body text-sm text-white/80">
-                {w.icon} {w.en} → <span className="text-op-green">{w.es}</span>
-              </div>
-            ))}
+          {[
+            { value: score,                  label: 'Puntos',        color: 'text-white',     icon: '⭐' },
+            { value: `🍇 ${berriesEarned}`,  label: t.berriesEarned, color: 'text-op-gold',   icon: null },
+            { value: `🔥 ${maxStreak}`,       label: 'Mejor racha',   color: 'text-op-cyan',   icon: null },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-2 text-center"
+            >
+              <div className={`font-title text-2xl ${stat.color} leading-tight`}>{stat.value}</div>
+              <div className="font-body text-[10px] text-white/40 mt-1">{stat.label}</div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* ── Correct / wrong count bar ── */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+          className="rounded-2xl overflow-hidden flex h-8 border-2 border-white/10"
+          style={{ transformOrigin: 'left' }}
+        >
+          <div
+            className="bg-op-green flex items-center justify-center font-title text-sm text-op-ink"
+            style={{ width: `${(correctWords.length / totalQuestions) * 100}%` }}
+          >
+            {correctWords.length > 0 && `✓ ${correctWords.length}`}
+          </div>
+          <div
+            className="bg-op-red/60 flex items-center justify-center font-title text-sm text-white"
+            style={{ width: `${(wrongWords.length / totalQuestions) * 100}%` }}
+          >
+            {wrongWords.length > 0 && `✗ ${wrongWords.length}`}
           </div>
         </motion.div>
-      )}
 
-      {/* Wrong words */}
-      {wrongWords.length > 0 && (
+        {/* ── New achievements ── */}
+        {newAchievements.length > 0 && (
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="border-2 border-op-gold/50 bg-op-gold/10 rounded-2xl p-4"
+          >
+            <div className="font-title text-lg text-op-gold mb-3">🏆 ¡Nuevos logros!</div>
+            <div className="flex flex-col gap-2">
+              {newAchievements.map(id => {
+                const ach = ACHIEVEMENT_MAP[id]
+                if (!ach) return null
+                return (
+                  <div key={id} className="flex items-center gap-3 bg-op-gold/10 rounded-xl px-3 py-2">
+                    <span className="text-2xl">{ach.icon}</span>
+                    <div>
+                      <div className="font-title text-base text-op-gold leading-tight">{ach.title}</div>
+                      <div className="font-body text-xs text-white/40">{ach.description}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Words learned ── */}
+        {correctWords.length > 0 && (
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="border-2 border-op-green/40 bg-op-green/5 rounded-2xl p-4"
+          >
+            <div className="font-title text-lg text-op-green mb-3">✓ {t.wordsLearned}</div>
+            <div className="flex flex-col gap-2">
+              {correctWords.map((w, i) => (
+                <motion.div
+                  key={w.en}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 + i * 0.04 }}
+                  className="flex items-center justify-between bg-white/5 rounded-xl px-3 py-2"
+                >
+                  <span className="font-body text-sm text-white/70 flex items-center gap-2">
+                    <span className="text-lg">{w.icon}</span>
+                    {w.en}
+                  </span>
+                  <span className="font-title text-base text-op-green">→ {w.es}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Words to practice ── */}
+        {wrongWords.length > 0 && (
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="border-2 border-op-red/30 bg-op-red/5 rounded-2xl p-4"
+          >
+            <div className="font-title text-lg text-op-red mb-3">✗ Practica más</div>
+            <div className="flex flex-col gap-2">
+              {wrongWords.map((w, i) => (
+                <motion.div
+                  key={w.en}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.04 }}
+                  className="flex items-center justify-between bg-white/5 rounded-xl px-3 py-2"
+                >
+                  <span className="font-body text-sm text-white/50 flex items-center gap-2">
+                    <span className="text-lg">{w.icon}</span>
+                    {w.en}
+                  </span>
+                  <span className="font-title text-base text-op-red/80">→ {w.es}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Action buttons ── */}
         <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-op-ink/20 border-2 border-op-red/30 rounded-xl p-4 mb-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.45 }}
+          className="flex gap-3 pt-2"
         >
-          <div className="font-title text-xl text-op-red mb-2">✗ Practice more</div>
-          <div className="grid grid-cols-2 gap-1">
-            {wrongWords.map(w => (
-              <div key={w.en} className="font-body text-sm text-white/60">
-                {w.icon} {w.en} → <span className="text-op-red">{w.es}</span>
-              </div>
-            ))}
-          </div>
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => { resetRound(); setPhase('hub') }}
+            className="flex-1 py-4 rounded-2xl border-4 border-white/20 text-white/60 font-title text-xl hover:border-op-cyan hover:text-op-cyan transition-colors"
+          >
+            🏴‍☠️ HUB
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => { resetRound(); if (currentWorldId) useGameStore.getState().startRound(currentWorldId) }}
+            className="flex-[2] py-4 rounded-2xl border-4 border-op-ink bg-op-gold text-op-ink font-title text-2xl shadow-manga hover:brightness-105 transition-all"
+          >
+            {t.playAgain}
+          </motion.button>
         </motion.div>
-      )}
 
-      {/* Action buttons */}
-      <div className="flex gap-3 mt-2">
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => { resetRound(); setPhase('hub') }}
-          className="flex-1 py-4 rounded-xl border-4 border-op-ink/30 text-op-cyan font-title text-xl"
-        >
-          HUB
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handlePlayAgain}
-          className="flex-2 flex-grow-[2] py-4 rounded-xl border-4 border-op-ink bg-op-gold text-op-ink font-title text-2xl shadow-manga"
-        >
-          {t.playAgain}
-        </motion.button>
       </div>
     </div>
   )
