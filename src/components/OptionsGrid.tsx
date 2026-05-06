@@ -22,10 +22,10 @@ function getOptionState(
 }
 
 const stateStyles: Record<OptionState, string> = {
-  idle:    'bg-op-ocean-dark border-op-cyan text-op-cyan hover:bg-op-cyan/10 active:scale-95',
-  correct: 'bg-op-green border-op-green text-op-ink',
-  wrong:   'bg-op-red border-op-red text-white',
-  reveal:  'bg-op-ocean-dark border-op-ink/30 text-op-cyan/40',
+  idle:    'bg-[#0d2d4a] border-op-cyan text-op-cyan hover:bg-op-cyan/15 active:scale-[0.97]',
+  correct: 'bg-op-green/20 border-op-green text-op-green',
+  wrong:   'bg-op-red/20 border-op-red text-white',
+  reveal:  'bg-[#0d2d4a]/60 border-white/10 text-white/30',
 }
 
 const KEY_LABELS = ['1', '2', '3', '4']
@@ -40,18 +40,18 @@ export function OptionsGrid({ options, correctAnswer, selected, onSelect, disabl
             key={option}
             onClick={() => !disabled && onSelect(option)}
             disabled={disabled}
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.92, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: i * 0.05, type: 'spring', stiffness: 400 }}
+            transition={{ delay: i * 0.04, type: 'spring', stiffness: 380, damping: 22 }}
             className={`
               relative font-title text-2xl tracking-wide
-              rounded-xl border-4 py-4 px-2
-              shadow-manga-sm transition-colors duration-150
+              rounded-2xl border-4 py-5 px-3
+              transition-colors duration-100 cursor-pointer
               ${stateStyles[state]}
             `}
             aria-label={`Option ${i + 1}: ${option}`}
           >
-            <span className="absolute top-1 left-2 text-xs opacity-40 font-body">
+            <span className="absolute top-1.5 left-2.5 text-[10px] font-body opacity-40 leading-none">
               {KEY_LABELS[i]}
             </span>
             {option}

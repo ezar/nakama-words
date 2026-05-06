@@ -6,10 +6,10 @@ import { useSettingsStore } from '../store/settingsStore'
 import { WordCard } from '../components/WordCard'
 import { TimerRing } from '../components/TimerRing'
 import { OptionsGrid } from '../components/OptionsGrid'
-import { StreakBanner } from '../components/StreakBanner'
 import { ParticleEmitter } from '../components/ParticleEmitter'
 import { soundEngine } from '../audio/SoundEngine'
 import { getTranslations } from '../i18n/translations'
+import { getStreakMessage } from '../utils/rankHelpers'
 import { todayString } from '../engine/rng'
 
 const ADVANCE_DELAY = 1400
@@ -29,12 +29,13 @@ export function GameScreen() {
   const [selected, setSelected] = useState<string | null>(null)
   const [timerRunning, setTimerRunning] = useState(true)
   const [timerKey, setTimerKey] = useState(0)
-  const [feedbackLabel, setFeedbackLabel] = useState('')
+  const [feedbackCorrect, setFeedbackCorrect] = useState<boolean | null>(null)
   const [particleTrigger, setParticleTrigger] = useState(false)
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const totalQuestions = wordQueue.length
   const isLastQuestion = currentQuestionIndex >= totalQuestions - 1
+  const streakMsg = getStreakMessage(streak)
 
   const doAdvance = useCallback(() => {
     if (isLastQuestion) {
@@ -47,7 +48,7 @@ export function GameScreen() {
     } else {
       advanceQuestion()
       setSelected(null)
-      setFeedbackLabel('')
+      setFeedbackCorrect(null)
       setTimerKey(k => k + 1)
       setTimerRunning(true)
     }
@@ -59,30 +60,30 @@ export function GameScreen() {
     setSelected(option)
 
     const correct = answerQuestion(option)
+    setFeedbackCorrect(correct)
+
     if (correct) {
       soundEngine.playCorrect()
-      setFeedbackLabel(t.correct)
       setParticleTrigger(true)
       setTimeout(() => setParticleTrigger(false), 50)
       const { streak: newStreak } = useGameStore.getState()
       if (newStreak >= 5) soundEngine.playStreak()
     } else {
       soundEngine.playWrong()
-      setFeedbackLabel(t.wrong)
     }
 
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
-  }, [selected, answerQuestion, doAdvance, t])
+  }, [selected, answerQuestion, doAdvance])
 
   const handleTimeout = useCallback(() => {
     if (selected !== null) return
     setTimerRunning(false)
     setSelected('__timeout__')
+    setFeedbackCorrect(false)
     answerQuestion('')
-    setFeedbackLabel(t.timeout)
     soundEngine.playWrong()
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
-  }, [selected, answerQuestion, doAdvance, t])
+  }, [selected, answerQuestion, doAdvance])
 
   // Keyboard: 1–4
   useEffect(() => {
@@ -97,29 +98,49 @@ export function GameScreen() {
     return () => window.removeEventListener('keydown', handler)
   }, [currentQuestion, handleSelect])
 
-  // Reset on new question
   useEffect(() => {
     setSelected(null)
-    setFeedbackLabel('')
+    setFeedbackCorrect(null)
     setTimerRunning(true)
   }, [currentQuestionIndex])
 
   useEffect(() => {
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current)
-    }
+    return () => { if (advanceTimer.current) clearTimeout(advanceTimer.current) }
   }, [])
 
   if (!currentQuestion) return null
 
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 py-6 gap-4">
+    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 pt-5 pb-6">
       <ParticleEmitter trigger={particleTrigger} />
 
-      {/* Top: streak banner */}
-      <StreakBanner streak={streak} score={score} />
+      {/* ── Top bar: streak message + score ── */}
+      <div className="flex items-center justify-between mb-4">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={streakMsg}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 8 }}
+            className="font-body text-sm text-op-gold"
+            aria-live="polite"
+          >
+            {streakMsg}
+          </motion.span>
+        </AnimatePresence>
 
-      {/* Word card */}
+        <motion.div
+          key={score}
+          initial={{ scale: 1.35 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400 }}
+          className="font-title text-2xl text-op-gold"
+        >
+          🍇 {score}
+        </motion.div>
+      </div>
+
+      {/* ── Word card ── */}
       <AnimatePresence mode="wait">
         <WordCard
           key={currentQuestionIndex}
@@ -129,34 +150,40 @@ export function GameScreen() {
         />
       </AnimatePresence>
 
-      {/* Timer */}
-      <div className="flex justify-center">
+      {/* ── Timer + feedback row — FIXED HEIGHT so nothing shifts ── */}
+      <div className="flex items-center justify-center gap-5 my-3 h-28">
         <TimerRing
           key={timerKey}
           duration={QUESTION_DURATION}
           onTimeout={handleTimeout}
           running={timerRunning}
         />
+
+        {/* Feedback badge — absolutely-sized so it never pushes layout */}
+        <div className="w-36 flex items-center justify-center">
+          <AnimatePresence>
+            {feedbackCorrect !== null && (
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                className={`
+                  px-4 py-2 rounded-2xl border-4 font-title text-2xl text-center
+                  ${feedbackCorrect
+                    ? 'border-op-green text-op-green bg-op-green/10'
+                    : 'border-op-red text-op-red bg-op-red/10'}
+                `}
+                aria-live="assertive"
+              >
+                {feedbackCorrect ? '✓ ' + t.correct : '✗ ' + t.wrong}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Feedback label */}
-      <AnimatePresence>
-        {feedbackLabel && (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={`text-center font-title text-3xl ${
-              feedbackLabel === t.correct ? 'text-op-green' : 'text-op-red'
-            }`}
-            aria-live="assertive"
-          >
-            {feedbackLabel}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Options */}
+      {/* ── Answer options ── */}
       <OptionsGrid
         options={currentQuestion.options}
         correctAnswer={currentQuestion.correctAnswer}
@@ -165,9 +192,9 @@ export function GameScreen() {
         disabled={selected !== null}
       />
 
-      {/* World label */}
-      <div className="text-center font-body text-xs text-op-cyan/30">
-        {currentWorldId?.toUpperCase()} {isDaily ? '· DAILY ×3' : ''}
+      {/* ── World / daily label ── */}
+      <div className="text-center font-body text-xs text-white/20 mt-4 tracking-widest">
+        {currentWorldId?.toUpperCase()}{isDaily ? ' · DAILY ×3' : ''}
       </div>
     </div>
   )
