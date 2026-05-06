@@ -115,7 +115,7 @@ export function GameScreen() {
       <ParticleEmitter trigger={particleTrigger} />
 
       {/* ── Top bar: streak message + score ── */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <AnimatePresence mode="wait">
           <motion.span
             key={streakMsg}
@@ -140,18 +140,20 @@ export function GameScreen() {
         </motion.div>
       </div>
 
-      {/* ── Word card ── */}
-      <AnimatePresence mode="wait">
-        <WordCard
-          key={currentQuestionIndex}
-          entry={currentQuestion.prompt}
-          questionNumber={currentQuestionIndex + 1}
-          totalQuestions={totalQuestions}
-        />
-      </AnimatePresence>
+      {/* ── Word card — flex-1 so it takes all middle space ── */}
+      <div className="flex-1 flex flex-col justify-center py-4">
+        <AnimatePresence mode="wait">
+          <WordCard
+            key={currentQuestionIndex}
+            entry={currentQuestion.prompt}
+            questionNumber={currentQuestionIndex + 1}
+            totalQuestions={totalQuestions}
+          />
+        </AnimatePresence>
+      </div>
 
-      {/* ── Timer + feedback row — FIXED HEIGHT so nothing shifts ── */}
-      <div className="flex items-center justify-center gap-5 my-3 h-28">
+      {/* ── Timer + feedback — fixed height, nothing shifts ── */}
+      <div className="flex items-center justify-center gap-4 h-28 mb-4">
         <TimerRing
           key={timerKey}
           duration={QUESTION_DURATION}
@@ -159,8 +161,7 @@ export function GameScreen() {
           running={timerRunning}
         />
 
-        {/* Feedback badge — absolutely-sized so it never pushes layout */}
-        <div className="w-36 flex items-center justify-center">
+        <div className="w-40 flex items-center justify-center">
           <AnimatePresence>
             {feedbackCorrect !== null && (
               <motion.div
@@ -169,7 +170,7 @@ export function GameScreen() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 22 }}
                 className={`
-                  px-4 py-2 rounded-2xl border-4 font-title text-2xl text-center
+                  px-4 py-2 rounded-2xl border-4 font-title text-2xl text-center w-full
                   ${feedbackCorrect
                     ? 'border-op-green text-op-green bg-op-green/10'
                     : 'border-op-red text-op-red bg-op-red/10'}
