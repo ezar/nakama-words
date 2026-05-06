@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --op-ocean-dark: #0a2240;
+  --op-gold: #FFD600;
+  --op-red: #D32F2F;
+  --op-parchment: #FFF8E1;
+  --op-ink: #1A1A1A;
+  --op-green: #00E676;
+  --op-cyan: #00E5FF;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html, body, #root {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: var(--op-ocean-dark);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+@layer utilities {
+  .shadow-manga {
+    box-shadow: 5px 5px 0 #1A1A1A;
+  }
+  .shadow-manga-sm {
+    box-shadow: 3px 3px 0 #1A1A1A;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
