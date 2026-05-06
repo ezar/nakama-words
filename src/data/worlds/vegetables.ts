@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const vegetablesWorld: World = {
+  id: 'vegetables',
+  label: 'VEGETABLES',
+  name: 'Vegetables 🥦',
+  emoji: '🥦',
+  berriesRequired: 38000,
+  words: [
+    { en: 'GARLIC',      es: 'AJO',        hint: 'Small, white and very smelly!',   icon: '🧄' },
+    { en: 'PEPPER',      es: 'PIMIENTO',   hint: 'Red, green or yellow, crunchy',   icon: '🌶️' },
+    { en: 'CUCUMBER',    es: 'PEPINO',     hint: 'Long, green, cool and crunchy',   icon: '🥒' },
+    { en: 'LETTUCE',     es: 'LECHUGA',    hint: 'Green leafy base of a salad',     icon: '🥬' },
+    { en: 'BROCCOLI',    es: 'BRÓCOLI',    hint: 'Green, looks like a tiny tree',   icon: '🥦' },
+    { en: 'CORN',        es: 'MAÍZ',       hint: 'Yellow kernels on a cob',         icon: '🌽' },
+    { en: 'PEAS',        es: 'GUISANTES',  hint: 'Tiny green balls in a pod',       icon: '🫛' },
+    { en: 'BEANS',       es: 'FRIJOLES',   hint: 'Common in soups and stews',       icon: '🫘' },
+    { en: 'SPINACH',     es: 'ESPINACAS',  hint: "Popeye's favorite green veggie",  icon: '🥬' },
+    { en: 'MUSHROOM',    es: 'CHAMPIÑÓN',  hint: 'Round cap, grows in the forest',  icon: '🍄' },
+    { en: 'CELERY',      es: 'APIO',       hint: 'Long green crunchy stalks',       icon: '🌿' },
+    { en: 'CAULIFLOWER', es: 'COLIFLOR',   hint: 'White, looks like broccoli',      icon: '🥦' },
+    { en: 'ASPARAGUS',   es: 'ESPÁRRAGOS', hint: 'Long thin green stalks',          icon: '🌿' },
+    { en: 'EGGPLANT',    es: 'BERENJENA',  hint: 'Dark purple, shiny vegetable',    icon: '🍆' },
+    { en: 'ZUCCHINI',    es: 'CALABACÍN',  hint: 'Long green summer squash',        icon: '🥒' },
+    { en: 'ARTICHOKE',   es: 'ALCACHOFA',  hint: 'Green, layered like a flower',    icon: '🌿' },
+    { en: 'PUMPKIN',     es: 'CALABAZA',   hint: 'Big orange, carved for Halloween', icon: '🎃' },
+    { en: 'RADISH',      es: 'RÁBANO',     hint: 'Small, red and a bit spicy',      icon: '🔴' },
+    { en: 'LEEK',        es: 'PUERRO',     hint: 'Like a giant spring onion',       icon: '🌿' },
+    { en: 'BEETROOT',    es: 'REMOLACHA',  hint: 'Deep red, turns everything pink', icon: '🟣' },
+  ],
+}

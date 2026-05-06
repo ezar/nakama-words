@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const numbersWorld: World = {
+  id: 'numbers',
+  label: 'NUMBERS',
+  name: 'Numbers 🔢',
+  emoji: '🔢',
+  berriesRequired: 5000,
+  words: [
+    { en: 'ONE',         es: 'UNO',        hint: '1 — one finger up',               icon: '1️⃣' },
+    { en: 'TWO',         es: 'DOS',        hint: '2 — a pair of shoes',             icon: '2️⃣' },
+    { en: 'THREE',       es: 'TRES',       hint: '3 — a triangle has this many sides', icon: '3️⃣' },
+    { en: 'FOUR',        es: 'CUATRO',     hint: '4 — legs on a table',             icon: '4️⃣' },
+    { en: 'FIVE',        es: 'CINCO',      hint: '5 — fingers on one hand',         icon: '5️⃣' },
+    { en: 'SIX',         es: 'SEIS',       hint: '6 — sides of a hexagon',          icon: '6️⃣' },
+    { en: 'SEVEN',       es: 'SIETE',      hint: '7 — days in a week',              icon: '7️⃣' },
+    { en: 'EIGHT',       es: 'OCHO',       hint: '8 — legs on a spider',            icon: '8️⃣' },
+    { en: 'NINE',        es: 'NUEVE',      hint: '9 — one less than ten',           icon: '9️⃣' },
+    { en: 'TEN',         es: 'DIEZ',       hint: '10 — fingers on two hands',       icon: '🔟' },
+    { en: 'ELEVEN',      es: 'ONCE',       hint: '11 — players in a soccer team',   icon: '⚽' },
+    { en: 'TWELVE',      es: 'DOCE',       hint: '12 — months in a year',           icon: '📅' },
+    { en: 'THIRTEEN',    es: 'TRECE',      hint: '13 — unlucky number for some!',   icon: '🍀' },
+    { en: 'FOURTEEN',    es: 'CATORCE',    hint: '14 — two weeks have this many days', icon: '📆' },
+    { en: 'FIFTEEN',     es: 'QUINCE',     hint: '15 — quarter of an hour',         icon: '⏰' },
+    { en: 'SIXTEEN',     es: 'DIECISÉIS',  hint: '16 — sweet sixteen!',             icon: '🎂' },
+    { en: 'SEVENTEEN',   es: 'DIECISIETE', hint: '17 — almost eighteen',            icon: '✨' },
+    { en: 'EIGHTEEN',    es: 'DIECIOCHO',  hint: '18 — holes on a golf course',     icon: '⛳' },
+    { en: 'NINETEEN',    es: 'DIECINUEVE', hint: '19 — one before twenty',          icon: '🔢' },
+    { en: 'TWENTY',      es: 'VEINTE',     hint: '20 — toes on two people',         icon: '💯' },
+  ],
+}

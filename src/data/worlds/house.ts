@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const houseWorld: World = {
+  id: 'house',
+  label: 'HOUSE',
+  name: 'House 🏠',
+  emoji: '🏠',
+  berriesRequired: 12000,
+  words: [
+    { en: 'HOUSE',       es: 'CASA',       hint: 'Where your family lives',         icon: '🏠' },
+    { en: 'DOOR',        es: 'PUERTA',     hint: 'You open it to go in or out',     icon: '🚪' },
+    { en: 'WINDOW',      es: 'VENTANA',    hint: 'See outside through it',          icon: '🪟' },
+    { en: 'KITCHEN',     es: 'COCINA',     hint: 'Room where you cook food',        icon: '🍳' },
+    { en: 'BATHROOM',    es: 'BAÑO',       hint: 'Room with toilet and shower',     icon: '🛁' },
+    { en: 'BEDROOM',     es: 'HABITACIÓN', hint: 'Room where you sleep',            icon: '🛏️' },
+    { en: 'LIVING ROOM', es: 'SALÓN',      hint: 'Room where family gathers',       icon: '🛋️' },
+    { en: 'GARDEN',      es: 'JARDÍN',     hint: 'Outdoor space with plants',       icon: '🌻' },
+    { en: 'TABLE',       es: 'MESA',       hint: 'You eat meals on it',             icon: '🪑' },
+    { en: 'CHAIR',       es: 'SILLA',      hint: 'You sit on it',                   icon: '🪑' },
+    { en: 'BED',         es: 'CAMA',       hint: 'You sleep in it at night',        icon: '🛏️' },
+    { en: 'SOFA',        es: 'SOFÁ',       hint: 'Comfortable seat for the living room', icon: '🛋️' },
+    { en: 'LAMP',        es: 'LÁMPARA',    hint: 'Gives light in a room',           icon: '💡' },
+    { en: 'STAIRS',      es: 'ESCALERAS',  hint: 'Steps to go up to another floor', icon: '🪜' },
+    { en: 'FLOOR',       es: 'SUELO',      hint: 'What you walk on inside',         icon: '🏠' },
+    { en: 'CEILING',     es: 'TECHO',      hint: 'Above your head in a room',       icon: '🏠' },
+    { en: 'WALL',        es: 'PARED',      hint: 'Vertical surface of a room',      icon: '🧱' },
+    { en: 'ROOF',        es: 'TEJADO',     hint: 'Top of the house, keeps rain out', icon: '🏠' },
+    { en: 'GARAGE',      es: 'GARAJE',     hint: 'Where you park the car',          icon: '🚗' },
+    { en: 'MIRROR',      es: 'ESPEJO',     hint: 'You see your reflection in it',   icon: '🪞' },
+  ],
+}

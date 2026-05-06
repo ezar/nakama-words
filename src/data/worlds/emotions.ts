@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const emotionsWorld: World = {
+  id: 'emotions',
+  label: 'EMOTIONS',
+  name: 'Emotions 😊',
+  emoji: '😊',
+  berriesRequired: 60000,
+  words: [
+    { en: 'HAPPY',       es: 'FELIZ',      hint: 'Feeling great and smiling',       icon: '😊' },
+    { en: 'SAD',         es: 'TRISTE',     hint: 'Feeling like you want to cry',    icon: '😢' },
+    { en: 'ANGRY',       es: 'ENOJADO',    hint: 'Feeling very mad',                icon: '😠' },
+    { en: 'SCARED',      es: 'ASUSTADO',   hint: 'Feeling afraid of something',     icon: '😱' },
+    { en: 'SURPRISED',   es: 'SORPRENDIDO',hint: 'Didn\'t expect that!',            icon: '😲' },
+    { en: 'TIRED',       es: 'CANSADO',    hint: 'Need to rest or sleep',           icon: '😴' },
+    { en: 'EXCITED',     es: 'EMOCIONADO', hint: 'Can\'t wait, feeling great energy', icon: '🤩' },
+    { en: 'BORED',       es: 'ABURRIDO',   hint: 'Nothing interesting to do',       icon: '😑' },
+    { en: 'NERVOUS',     es: 'NERVIOSO',   hint: 'Worried about something coming',  icon: '😰' },
+    { en: 'PROUD',       es: 'ORGULLOSO',  hint: 'Did something great, feeling good', icon: '😤' },
+    { en: 'LOVE',        es: 'AMOR',       hint: 'The strongest positive feeling',  icon: '❤️' },
+    { en: 'CALM',        es: 'TRANQUILO',  hint: 'Peaceful, no stress',             icon: '😌' },
+    { en: 'CONFUSED',    es: 'CONFUNDIDO', hint: 'Don\'t understand what\'s going on', icon: '😕' },
+    { en: 'SHY',         es: 'TÍMIDO',     hint: 'Uncomfortable around new people', icon: '😳' },
+    { en: 'BRAVE',       es: 'VALIENTE',   hint: 'Not afraid to face danger',       icon: '🦁' },
+    { en: 'KIND',        es: 'AMABLE',     hint: 'Nice and helpful to others',      icon: '🤗' },
+    { en: 'JEALOUS',     es: 'CELOSO',     hint: 'Wishing you had what others have', icon: '😒' },
+    { en: 'GRATEFUL',    es: 'AGRADECIDO', hint: 'Thankful for something',          icon: '🙏' },
+    { en: 'LONELY',      es: 'SOLO',       hint: 'No one around, feeling empty',    icon: '😔' },
+    { en: 'CHEERFUL',    es: 'ALEGRE',     hint: 'Bright and happy mood',           icon: '😄' },
+  ],
+}

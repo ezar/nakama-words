@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const clothesWorld: World = {
+  id: 'clothes',
+  label: 'CLOTHES',
+  name: 'Clothes 👕',
+  emoji: '👕',
+  berriesRequired: 8000,
+  words: [
+    { en: 'SHIRT',       es: 'CAMISA',     hint: 'You wear it on your upper body',  icon: '👔' },
+    { en: 'PANTS',       es: 'PANTALONES', hint: 'Covers both legs',                icon: '👖' },
+    { en: 'SHOES',       es: 'ZAPATOS',    hint: 'You wear them on your feet',      icon: '👟' },
+    { en: 'SOCKS',       es: 'CALCETINES', hint: 'Go inside your shoes',            icon: '🧦' },
+    { en: 'HAT',         es: 'SOMBRERO',   hint: 'Worn on top of your head',        icon: '🎩' },
+    { en: 'DRESS',       es: 'VESTIDO',    hint: 'One-piece outfit, usually for girls', icon: '👗' },
+    { en: 'JACKET',      es: 'CHAQUETA',   hint: 'Light coat you zip up',           icon: '🧥' },
+    { en: 'SKIRT',       es: 'FALDA',      hint: 'Hangs from the waist down',       icon: '👗' },
+    { en: 'BOOTS',       es: 'BOTAS',      hint: 'Tall shoes, good for rain or snow', icon: '🥾' },
+    { en: 'GLOVES',      es: 'GUANTES',    hint: 'Keep your hands warm in winter',  icon: '🧤' },
+    { en: 'SCARF',       es: 'BUFANDA',    hint: 'Wrap it around your neck in winter', icon: '🧣' },
+    { en: 'SWEATER',     es: 'SUÉTER',     hint: 'Warm knitted top',                icon: '🧶' },
+    { en: 'SHORTS',      es: 'PANTALÓN CORTO', hint: 'Short pants for hot weather', icon: '🩳' },
+    { en: 'COAT',        es: 'ABRIGO',     hint: 'Long warm jacket for winter',     icon: '🧥' },
+    { en: 'BELT',        es: 'CINTURÓN',   hint: 'Keeps your pants from falling',   icon: '👔' },
+    { en: 'TIE',         es: 'CORBATA',    hint: 'Hangs from the collar of a shirt', icon: '👔' },
+    { en: 'PAJAMAS',     es: 'PIJAMA',     hint: 'What you wear to sleep',          icon: '😴' },
+    { en: 'SANDALS',     es: 'SANDALIAS',  hint: 'Open shoes for warm weather',     icon: '👡' },
+    { en: 'CAP',         es: 'GORRA',      hint: 'Baseball-style hat with a brim',  icon: '🧢' },
+    { en: 'SWIMSUIT',    es: 'BAÑADOR',    hint: 'Wear this at the beach or pool',  icon: '🩱' },
+  ],
+}

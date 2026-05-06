@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const natureWorld: World = {
+  id: 'nature',
+  label: 'NATURE',
+  name: 'Nature 🌿',
+  emoji: '🌿',
+  berriesRequired: 23000,
+  words: [
+    { en: 'SUN',         es: 'SOL',        hint: 'Shines and gives us light and heat', icon: '☀️' },
+    { en: 'MOON',        es: 'LUNA',        hint: 'Shines at night in the sky',      icon: '🌕' },
+    { en: 'STAR',        es: 'ESTRELLA',   hint: 'Tiny light in the night sky',      icon: '⭐' },
+    { en: 'CLOUD',       es: 'NUBE',       hint: 'White puff in the sky',            icon: '☁️' },
+    { en: 'RAIN',        es: 'LLUVIA',     hint: 'Water that falls from clouds',     icon: '🌧️' },
+    { en: 'SNOW',        es: 'NIEVE',      hint: 'White frozen flakes from the sky', icon: '❄️' },
+    { en: 'WIND',        es: 'VIENTO',     hint: 'Moving air you can feel',          icon: '💨' },
+    { en: 'TREE',        es: 'ÁRBOL',      hint: 'Tall plant with trunk and leaves', icon: '🌳' },
+    { en: 'FLOWER',      es: 'FLOR',       hint: 'Colorful, has petals and a smell', icon: '🌸' },
+    { en: 'MOUNTAIN',    es: 'MONTAÑA',    hint: 'Very tall rocky landform',         icon: '⛰️' },
+    { en: 'RIVER',       es: 'RÍO',        hint: 'Long flowing body of fresh water', icon: '🏞️' },
+    { en: 'SEA',         es: 'MAR',        hint: 'Large body of salt water',         icon: '🌊' },
+    { en: 'FOREST',      es: 'BOSQUE',     hint: 'Large area full of trees',         icon: '🌲' },
+    { en: 'SKY',         es: 'CIELO',      hint: 'Above everything, blue in daytime', icon: '🌤️' },
+    { en: 'EARTH',       es: 'TIERRA',     hint: 'The ground under your feet',       icon: '🌍' },
+    { en: 'ROCK',        es: 'ROCA',       hint: 'Hard piece of stone',              icon: '🪨' },
+    { en: 'GRASS',       es: 'HIERBA',     hint: 'Green ground cover in parks',      icon: '🌿' },
+    { en: 'LEAF',        es: 'HOJA',       hint: 'Flat green part of a plant',       icon: '🍃' },
+    { en: 'RAINBOW',     es: 'ARCO IRIS',  hint: 'Colorful arc after rain',          icon: '🌈' },
+    { en: 'ISLAND',      es: 'ISLA',       hint: 'Land completely surrounded by water', icon: '🏝️' },
+  ],
+}

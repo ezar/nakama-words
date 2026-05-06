@@ -12,11 +12,21 @@ interface ProfileSnapshot {
 }
 
 const WORLD_ACHIEVEMENT: Record<WorldId, string> = {
-  animals: 'animal_expert',
-  food: 'food_fanatic',
-  colors: 'color_wizard',
-  family: 'family_champ',
-  body: 'body_language',
+  animals:    'animal_expert',
+  food:       'food_fanatic',
+  colors:     'color_wizard',
+  family:     'family_champ',
+  body:       'body_language',
+  numbers:    'number_cruncher',
+  clothes:    'fashion_pirate',
+  house:      'home_crew',
+  school:     'top_student',
+  nature:     'nature_lover',
+  fruits:     'fruit_ninja',
+  vegetables: 'veggie_hero',
+  sports:     'sports_star',
+  emotions:   'feel_it_all',
+  actions:    'action_hero',
 }
 
 export function checkNewAchievements(snapshot: ProfileSnapshot): string[] {
@@ -24,9 +34,7 @@ export function checkNewAchievements(snapshot: ProfileSnapshot): string[] {
   const newOnes: string[] = []
 
   function check(id: string, condition: boolean) {
-    if (condition && !already.has(id)) {
-      newOnes.push(id)
-    }
+    if (condition && !already.has(id)) newOnes.push(id)
   }
 
   check('first_combo',    snapshot.maxStreak >= 3)

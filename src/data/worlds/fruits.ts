@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const fruitsWorld: World = {
+  id: 'fruits',
+  label: 'FRUITS',
+  name: 'Fruits 🍓',
+  emoji: '🍓',
+  berriesRequired: 30000,
+  words: [
+    { en: 'MANGO',       es: 'MANGO',      hint: 'Tropical, sweet and orange inside', icon: '🥭' },
+    { en: 'PINEAPPLE',   es: 'PIÑA',       hint: 'Spiky outside, sweet inside',     icon: '🍍' },
+    { en: 'MELON',       es: 'MELÓN',      hint: 'Green or yellow, very sweet',      icon: '🍈' },
+    { en: 'PEACH',       es: 'MELOCOTÓN',  hint: 'Fuzzy skin, sweet and juicy',      icon: '🍑' },
+    { en: 'PEAR',        es: 'PERA',       hint: 'Green or yellow, teardrop shape',  icon: '🍐' },
+    { en: 'CHERRY',      es: 'CEREZA',     hint: 'Tiny red fruit with a long stem',  icon: '🍒' },
+    { en: 'KIWI',        es: 'KIWI',       hint: 'Brown outside, bright green inside', icon: '🥝' },
+    { en: 'COCONUT',     es: 'COCO',       hint: 'Hard brown shell, white inside',   icon: '🥥' },
+    { en: 'PAPAYA',      es: 'PAPAYA',     hint: 'Tropical, orange flesh, black seeds', icon: '🍈' },
+    { en: 'BLUEBERRY',   es: 'ARÁNDANO',   hint: 'Tiny dark blue berry',             icon: '🫐' },
+    { en: 'RASPBERRY',   es: 'FRAMBUESA',  hint: 'Small red berry with bumps',       icon: '🍓' },
+    { en: 'PLUM',        es: 'CIRUELA',    hint: 'Purple, small and sweet',          icon: '🍇' },
+    { en: 'APRICOT',     es: 'ALBARICOQUE',hint: 'Small orange fruit, like a peach', icon: '🍑' },
+    { en: 'FIG',         es: 'HIGO',       hint: 'Purple outside, red and sweet inside', icon: '🍇' },
+    { en: 'POMEGRANATE', es: 'GRANADA',    hint: 'Full of tiny red juicy seeds',     icon: '🍎' },
+    { en: 'AVOCADO',     es: 'AGUACATE',   hint: 'Green, creamy inside, used in guacamole', icon: '🥑' },
+    { en: 'LIME',        es: 'LIMA',       hint: 'Small green citrus, very sour',    icon: '🍋' },
+    { en: 'GUAVA',       es: 'GUAYABA',    hint: 'Tropical pink-fleshed fruit',      icon: '🍈' },
+    { en: 'GRAPE',       es: 'UVA',        hint: 'Small round fruit in bunches',     icon: '🍇' },
+    { en: 'PASSION FRUIT', es: 'MARACUYÁ', hint: 'Tropical, wrinkled purple skin',   icon: '🍈' },
+  ],
+}

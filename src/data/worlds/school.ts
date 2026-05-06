@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const schoolWorld: World = {
+  id: 'school',
+  label: 'SCHOOL',
+  name: 'School 📚',
+  emoji: '📚',
+  berriesRequired: 17000,
+  words: [
+    { en: 'SCHOOL',      es: 'ESCUELA',    hint: 'Building where you study',        icon: '🏫' },
+    { en: 'TEACHER',     es: 'MAESTRA',    hint: 'The person who teaches you',      icon: '👩‍🏫' },
+    { en: 'STUDENT',     es: 'ESTUDIANTE', hint: 'A person who is learning',        icon: '🧑‍🎓' },
+    { en: 'BOOK',        es: 'LIBRO',      hint: 'Has pages filled with words',     icon: '📖' },
+    { en: 'PEN',         es: 'BOLÍGRAFO',  hint: 'You write with it using ink',     icon: '🖊️' },
+    { en: 'PENCIL',      es: 'LÁPIZ',      hint: 'You can erase what you write',    icon: '✏️' },
+    { en: 'DESK',        es: 'ESCRITORIO', hint: 'Table where you study',           icon: '🪑' },
+    { en: 'BOARD',       es: 'PIZARRA',    hint: 'Teacher writes on it in class',   icon: '📋' },
+    { en: 'NOTEBOOK',    es: 'CUADERNO',   hint: 'You write your notes in it',      icon: '📓' },
+    { en: 'BACKPACK',    es: 'MOCHILA',    hint: 'Bag you carry on your back',      icon: '🎒' },
+    { en: 'RULER',       es: 'REGLA',      hint: 'Used to draw straight lines',     icon: '📏' },
+    { en: 'ERASER',      es: 'GOMA',       hint: 'Removes pencil marks',            icon: '🧹' },
+    { en: 'CLASS',       es: 'CLASE',      hint: 'A lesson with the teacher',       icon: '🏫' },
+    { en: 'HOMEWORK',    es: 'TAREA',      hint: 'Work you do at home for school',  icon: '📝' },
+    { en: 'LIBRARY',     es: 'BIBLIOTECA', hint: 'Full of books to read',           icon: '📚' },
+    { en: 'DICTIONARY',  es: 'DICCIONARIO',hint: 'Book that explains word meanings', icon: '📕' },
+    { en: 'CALENDAR',    es: 'CALENDARIO', hint: 'Shows all the days of the year',  icon: '📅' },
+    { en: 'SCISSORS',    es: 'TIJERAS',    hint: 'Two blades for cutting paper',    icon: '✂️' },
+    { en: 'CRAYON',      es: 'CRAYÓN',     hint: 'Colorful waxy stick for drawing', icon: '🖍️' },
+    { en: 'EXAM',        es: 'EXAMEN',     hint: 'A test to show what you know',    icon: '📄' },
+  ],
+}

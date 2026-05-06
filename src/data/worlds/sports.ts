@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const sportsWorld: World = {
+  id: 'sports',
+  label: 'SPORTS',
+  name: 'Sports ⚽',
+  emoji: '⚽',
+  berriesRequired: 48000,
+  words: [
+    { en: 'FOOTBALL',    es: 'FÚTBOL',     hint: 'Most popular sport in the world', icon: '⚽' },
+    { en: 'BASKETBALL',  es: 'BALONCESTO', hint: 'Throw the ball through the hoop', icon: '🏀' },
+    { en: 'TENNIS',      es: 'TENIS',      hint: 'Hit a ball over a net with a racket', icon: '🎾' },
+    { en: 'SWIMMING',    es: 'NATACIÓN',   hint: 'Moving through water',             icon: '🏊' },
+    { en: 'RUNNING',     es: 'CARRERA',    hint: 'Going fast on your feet',          icon: '🏃' },
+    { en: 'CYCLING',     es: 'CICLISMO',   hint: 'Riding a bicycle',                 icon: '🚴' },
+    { en: 'GOLF',        es: 'GOLF',       hint: 'Hit a ball into a small hole',     icon: '⛳' },
+    { en: 'VOLLEYBALL',  es: 'VOLEIBOL',   hint: 'Hit a ball over a high net',       icon: '🏐' },
+    { en: 'BASEBALL',    es: 'BÉISBOL',    hint: 'Hit a ball with a bat and run',    icon: '⚾' },
+    { en: 'BOXING',      es: 'BOXEO',      hint: 'Fighting with your fists',         icon: '🥊' },
+    { en: 'SKIING',      es: 'ESQUÍ',      hint: 'Sliding down snowy mountains',     icon: '⛷️' },
+    { en: 'SURFING',     es: 'SURF',       hint: 'Riding waves on a board',          icon: '🏄' },
+    { en: 'GYMNASTICS',  es: 'GIMNASIA',   hint: 'Flips, jumps, and balance tricks', icon: '🤸' },
+    { en: 'DANCING',     es: 'BAILE',      hint: 'Moving to the rhythm of music',    icon: '💃' },
+    { en: 'SKATING',     es: 'PATINAJE',   hint: 'Gliding on ice or wheels',         icon: '⛸️' },
+    { en: 'ARCHERY',     es: 'TIRO CON ARCO', hint: 'Shooting arrows at a target',  icon: '🏹' },
+    { en: 'RUGBY',       es: 'RUGBY',      hint: 'Like football but hands allowed',  icon: '🏉' },
+    { en: 'HOCKEY',      es: 'HOCKEY',     hint: 'Hit a puck with a stick on ice',   icon: '🏒' },
+    { en: 'WRESTLING',   es: 'LUCHA',      hint: 'Trying to pin your opponent down', icon: '🤼' },
+    { en: 'KARATE',      es: 'KARATE',     hint: 'Martial art with kicks and punches', icon: '🥋' },
+  ],
+}

@@ -1,0 +1,31 @@
+import type { World } from '../words'
+
+export const actionsWorld: World = {
+  id: 'actions',
+  label: 'ACTIONS',
+  name: 'Actions 🏃',
+  emoji: '🏃',
+  berriesRequired: 75000,
+  words: [
+    { en: 'RUN',         es: 'CORRER',     hint: 'Move fast on your feet',          icon: '🏃' },
+    { en: 'JUMP',        es: 'SALTAR',     hint: 'Push off the ground and go up',   icon: '🦘' },
+    { en: 'EAT',         es: 'COMER',      hint: 'Put food in your mouth',          icon: '😋' },
+    { en: 'DRINK',       es: 'BEBER',      hint: 'Swallow liquid',                  icon: '🥤' },
+    { en: 'SLEEP',       es: 'DORMIR',     hint: 'Rest with eyes closed at night',  icon: '😴' },
+    { en: 'PLAY',        es: 'JUGAR',      hint: 'Have fun with toys or games',     icon: '🎮' },
+    { en: 'READ',        es: 'LEER',       hint: 'Look at words and understand them', icon: '📖' },
+    { en: 'WRITE',       es: 'ESCRIBIR',   hint: 'Put words on paper with a pen',   icon: '✍️' },
+    { en: 'SING',        es: 'CANTAR',     hint: 'Make music with your voice',      icon: '🎤' },
+    { en: 'DANCE',       es: 'BAILAR',     hint: 'Move your body to the rhythm',    icon: '💃' },
+    { en: 'SWIM',        es: 'NADAR',      hint: 'Move through water',              icon: '🏊' },
+    { en: 'FLY',         es: 'VOLAR',      hint: 'Travel through the air',          icon: '✈️' },
+    { en: 'WALK',        es: 'CAMINAR',    hint: 'Move step by step',               icon: '🚶' },
+    { en: 'TALK',        es: 'HABLAR',     hint: 'Say words out loud',              icon: '🗣️' },
+    { en: 'LAUGH',       es: 'REÍR',       hint: 'Express joy out loud — ha ha ha!', icon: '😂' },
+    { en: 'CRY',         es: 'LLORAR',     hint: 'Tears fall when you\'re sad',     icon: '😭' },
+    { en: 'THINK',       es: 'PENSAR',     hint: 'Use your brain to reason',        icon: '🤔' },
+    { en: 'LISTEN',      es: 'ESCUCHAR',   hint: 'Pay attention to sounds',         icon: '👂' },
+    { en: 'WATCH',       es: 'MIRAR',      hint: 'Look at something for a while',   icon: '👀' },
+    { en: 'COOK',        es: 'COCINAR',    hint: 'Prepare food using heat',         icon: '👨‍🍳' },
+  ],
+}
