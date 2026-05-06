@@ -152,15 +152,15 @@ export function GameScreen() {
           />
         </AnimatePresence>
 
-        {/* Timer izquierda · Feedback derecha */}
-        <div className="flex items-center gap-4 px-1">
+        {/* Timer + Feedback apilados y centrados */}
+        <div className="flex flex-col items-center gap-3">
           <TimerRing
             key={timerKey}
             duration={QUESTION_DURATION}
             onTimeout={handleTimeout}
             running={timerRunning}
           />
-          <div className="flex-1 flex items-center justify-center min-h-[56px]">
+          <div className="h-12 flex items-center justify-center w-full">
             <AnimatePresence>
               {feedbackCorrect !== null && (
                 <motion.div
@@ -169,7 +169,7 @@ export function GameScreen() {
                   exit={{ scale: 0.8, opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 22 }}
                   className={`
-                    w-full px-4 py-3 rounded-2xl border-4 font-title text-2xl text-center
+                    px-8 py-2 rounded-2xl border-4 font-title text-2xl text-center
                     ${feedbackCorrect
                       ? 'border-op-green text-op-green bg-op-green/10'
                       : 'border-op-red text-op-red bg-op-red/10'}
