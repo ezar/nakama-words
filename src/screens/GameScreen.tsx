@@ -115,7 +115,7 @@ export function GameScreen() {
       <ParticleEmitter trigger={particleTrigger} />
 
       {/* ── TOP BAR ── */}
-      <div className="flex items-center justify-between flex-shrink-0 mb-3">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <AnimatePresence mode="wait">
           <motion.span
             key={streakMsg}
@@ -139,8 +139,10 @@ export function GameScreen() {
         </motion.div>
       </div>
 
-      {/* ── WORD CARD — grows to fill space above the bottom block ── */}
-      <div className="flex-1 flex items-center min-h-0">
+      {/* ── MIDDLE: card + timer/feedback centrados juntos ── */}
+      <div className="flex-1 flex flex-col justify-center gap-5 min-h-0">
+
+        {/* Word card */}
         <AnimatePresence mode="wait">
           <WordCard
             key={currentQuestionIndex}
@@ -149,43 +151,42 @@ export function GameScreen() {
             totalQuestions={totalQuestions}
           />
         </AnimatePresence>
-      </div>
 
-      {/* ── TIMER ROW: timer left · feedback right, full width ── */}
-      <div className="flex-shrink-0 flex items-center justify-between px-2 my-4">
-        <TimerRing
-          key={timerKey}
-          duration={QUESTION_DURATION}
-          onTimeout={handleTimeout}
-          running={timerRunning}
-        />
-
-        {/* Feedback — fixed area so layout never shifts */}
-        <div className="flex-1 flex items-center justify-center">
-          <AnimatePresence>
-            {feedbackCorrect !== null && (
-              <motion.div
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-                className={`
-                  px-5 py-3 rounded-2xl border-4 font-title text-3xl text-center
-                  ${feedbackCorrect
-                    ? 'border-op-green text-op-green bg-op-green/10'
-                    : 'border-op-red text-op-red bg-op-red/10'}
-                `}
-                aria-live="assertive"
-              >
-                {feedbackCorrect ? '✓ ' + t.correct : '✗ ' + t.wrong}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Timer izquierda · Feedback derecha */}
+        <div className="flex items-center gap-4 px-1">
+          <TimerRing
+            key={timerKey}
+            duration={QUESTION_DURATION}
+            onTimeout={handleTimeout}
+            running={timerRunning}
+          />
+          <div className="flex-1 flex items-center justify-center min-h-[56px]">
+            <AnimatePresence>
+              {feedbackCorrect !== null && (
+                <motion.div
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                  className={`
+                    w-full px-4 py-3 rounded-2xl border-4 font-title text-2xl text-center
+                    ${feedbackCorrect
+                      ? 'border-op-green text-op-green bg-op-green/10'
+                      : 'border-op-red text-op-red bg-op-red/10'}
+                  `}
+                  aria-live="assertive"
+                >
+                  {feedbackCorrect ? '✓ ' + t.correct : '✗ ' + t.wrong}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
+
       </div>
 
-      {/* ── ANSWER OPTIONS ── */}
-      <div className="flex-shrink-0">
+      {/* ── BOTTOM: opciones + label ── */}
+      <div className="flex-shrink-0 flex flex-col gap-3 mt-4">
         <OptionsGrid
           options={currentQuestion.options}
           correctAnswer={currentQuestion.correctAnswer}
@@ -193,11 +194,9 @@ export function GameScreen() {
           onSelect={handleSelect}
           disabled={selected !== null}
         />
-      </div>
-
-      {/* ── WORLD LABEL ── */}
-      <div className="text-center font-body text-xs text-white/20 mt-3 tracking-widest flex-shrink-0">
-        {currentWorldId?.toUpperCase()}{isDaily ? ' · DAILY ×3' : ''}
+        <div className="text-center font-body text-xs text-white/20 tracking-widest">
+          {currentWorldId?.toUpperCase()}{isDaily ? ' · DAILY ×3' : ''}
+        </div>
       </div>
     </div>
   )
