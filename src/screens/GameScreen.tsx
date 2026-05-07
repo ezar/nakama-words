@@ -135,7 +135,7 @@ export function GameScreen() {
   const answeredCount = currentQuestionIndex + (selected !== null ? 1 : 0)
 
   return (
-    <div className="flex flex-col h-screen bg-op-ocean-dark px-4 pt-5 pb-6">
+    <div className="flex flex-col h-full min-h-screen bg-op-ocean-dark px-4 pt-5 pb-6">
       <ParticleEmitter trigger={particleTrigger} />
 
       {/* Streak milestone banner */}

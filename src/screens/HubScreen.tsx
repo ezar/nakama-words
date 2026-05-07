@@ -34,14 +34,14 @@ export function HubScreen() {
   }
 
   const handleDaily = () => {
-    // Use first available world for daily (animals as fallback)
     startRound('animals', true)
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 py-6">
-      {/* Top bar */}
-      <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col min-h-full bg-op-ocean-dark px-4 py-6">
+
+      {/* ── Top bar ── */}
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <button
           onClick={() => setPhase('start')}
           className="font-body text-op-cyan/70 hover:text-op-cyan text-sm"
@@ -49,22 +49,16 @@ export function HubScreen() {
           ← {t.back}
         </button>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setPhase('achievements')}
-            className="font-body text-xs text-op-gold/60 hover:text-op-gold"
-          >
+          <button onClick={() => setPhase('achievements')} className="font-body text-xs text-op-gold/60 hover:text-op-gold">
             {t.achievements}
           </button>
-          <button
-            onClick={() => setPhase('ranking')}
-            className="font-body text-xs text-op-gold/60 hover:text-op-gold"
-          >
+          <button onClick={() => setPhase('ranking')} className="font-body text-xs text-op-gold/60 hover:text-op-gold">
             {t.ranking}
           </button>
           <button
             onClick={toggleSound}
-            className="font-body text-xs text-op-cyan/50 hover:text-op-cyan"
             title={soundEnabled ? t.soundOn : t.soundOff}
+            className="font-body text-sm text-op-cyan/50 hover:text-op-cyan"
           >
             {soundEnabled ? '🔊' : '🔇'}
           </button>
@@ -84,23 +78,23 @@ export function HubScreen() {
         </div>
       </div>
 
-      {/* Rank HUD */}
+      {/* ── Rank HUD ── */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-op-ink/20 rounded-2xl border-2 border-op-gold/30 p-4 mb-5"
+        className="bg-op-ink/20 rounded-2xl border-2 border-op-gold/30 p-4 mb-4 flex-shrink-0"
       >
         <div className="flex justify-between items-baseline mb-1">
           <span className="font-title text-xl text-op-gold">{profile.name}</span>
           <div className="flex items-center gap-3">
             {profile.dailyStreak > 0 && (
-              <span className="font-title text-base text-op-cyan">📅 ×{profile.dailyStreak}</span>
+              <span className="font-title text-sm text-op-cyan">📅 ×{profile.dailyStreak}</span>
             )}
             <span className="font-body text-xs text-op-gold/70">🍇 {profile.berries.toLocaleString()}</span>
           </div>
         </div>
         <div className="font-body text-sm text-op-cyan mb-2">{rank.label}</div>
-        <div className="h-3 rounded-full bg-op-ink/40 overflow-hidden border border-op-ink/60">
+        <div className="h-2.5 rounded-full bg-op-ink/40 overflow-hidden border border-op-ink/60">
           <motion.div
             className="h-full bg-op-gold rounded-full"
             initial={{ width: 0 }}
@@ -115,55 +109,64 @@ export function HubScreen() {
         )}
       </motion.div>
 
-      {/* Daily challenge */}
+      {/* ── Daily challenge ── */}
       <motion.button
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        onClick={handleDaily}
+        onClick={dailyDone ? undefined : handleDaily}
         disabled={dailyDone}
         className={`
-          w-full mb-5 py-4 rounded-xl border-4 font-title text-2xl tracking-wide shadow-manga
+          w-full mb-5 py-4 rounded-xl border-4 font-title text-2xl tracking-wide flex-shrink-0
           ${dailyDone
-            ? 'border-op-ink/30 text-op-ink/30 bg-transparent'
-            : 'border-op-cyan bg-op-cyan/10 text-op-cyan hover:bg-op-cyan/20'}
+            ? 'border-white/10 text-white/25 bg-transparent cursor-default'
+            : 'border-op-cyan bg-op-cyan/10 text-op-cyan hover:bg-op-cyan/20 shadow-manga'}
         `}
       >
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
 
-      {/* World grid */}
-      <h2 className="font-title text-2xl text-op-gold mb-3">{t.worldSelect}</h2>
-      <div className="grid grid-cols-1 gap-3 flex-1">
+      {/* ── World grid ── */}
+      <h2 className="font-title text-xl text-op-gold mb-3 flex-shrink-0">{t.worldSelect}</h2>
+      <div className="grid grid-cols-1 gap-2.5">
         {WORLDS.map((world, i) => {
           const locked = profile.berries < world.berriesRequired
           return (
             <motion.button
               key={world.id}
-              initial={{ x: -30, opacity: 0 }}
+              initial={{ x: -24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.15 + i * 0.07 }}
+              transition={{ delay: 0.12 + i * 0.05, type: 'spring', stiffness: 300 }}
               whileTap={locked ? {} : { scale: 0.97 }}
-              onClick={() => handleWorldSelect(world.id)}
+              onClick={() => !locked && handleWorldSelect(world.id)}
               className={`
-                flex items-center gap-4 px-5 py-4 rounded-xl border-4 text-left shadow-manga-sm
+                flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-colors
                 ${locked
-                  ? 'border-op-ink/20 bg-op-ink/10 opacity-50'
-                  : 'border-op-ink bg-op-parchment hover:brightness-110'}
+                  ? 'border-white/8 bg-white/[0.03] cursor-default'
+                  : 'border-op-ink bg-op-parchment hover:brightness-110 shadow-manga-sm'}
               `}
             >
-              <span className="text-4xl">{world.emoji}</span>
-              <div className="flex-1">
-                <div className={`font-title text-2xl ${locked ? 'text-op-ink/40' : 'text-op-ink'}`}>
-                  {world.name}
+              {/* Emoji */}
+              <span className={`text-3xl leading-none flex-shrink-0 ${locked ? 'grayscale opacity-40' : ''}`}>
+                {world.emoji}
+              </span>
+
+              {/* Name + subtitle */}
+              <div className="flex-1 min-w-0">
+                <div className={`font-title text-xl leading-tight ${locked ? 'text-white/30' : 'text-op-ink'}`}>
+                  {world.label}
                 </div>
-                <div className="font-body text-xs text-op-ink/40 mt-0.5">
+                <div className={`font-body text-xs mt-0.5 ${locked ? 'text-white/25' : 'text-op-ink/50'}`}>
                   {locked
                     ? `🔒 ${world.berriesRequired.toLocaleString()} ${t.berriesNeeded}`
                     : `${world.words.length} ${t.words}`}
                 </div>
               </div>
-              {!locked && <span className="text-2xl">▶</span>}
+
+              {/* Right indicator */}
+              <span className={`text-lg flex-shrink-0 ${locked ? 'text-white/15' : 'text-op-ink/50'}`}>
+                {locked ? '🔒' : '▶'}
+              </span>
             </motion.button>
           )
         })}
