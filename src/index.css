@@ -26,6 +26,18 @@ body {
   background-color: var(--op-ocean-dark);
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar { display: none; }
+
+/* Desktop: dot-grid background so the centred column floats */
+@media (min-width: 768px) {
+  body {
+    background-color: #04080f;
+    background-image: radial-gradient(#0d1f38 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+  }
 }
 
 @layer utilities {
@@ -34,6 +46,9 @@ body {
   }
   .shadow-manga-sm {
     box-shadow: 3px 3px 0 #1A1A1A;
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
   }
 }
 
