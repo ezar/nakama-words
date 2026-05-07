@@ -129,49 +129,39 @@ export function HubScreen() {
       {/* ── World list (scrolls inside the fixed container) ── */}
       <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-      <div className="grid grid-cols-1 gap-2">
-        {WORLDS.map((world, i) => {
-          const locked = profile.berries < world.berriesRequired
-          return (
-            <motion.button
-              key={world.id}
-              initial={{ x: -24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.12 + i * 0.05, type: 'spring', stiffness: 300 }}
-              whileTap={locked ? {} : { scale: 0.97 }}
-              onClick={() => !locked && handleWorldSelect(world.id)}
-              className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-colors
-                ${locked
-                  ? 'border-white/8 bg-white/[0.03] cursor-default'
-                  : 'border-op-ink bg-op-parchment hover:brightness-110 shadow-manga-sm'}
-              `}
-            >
-              {/* Emoji */}
-              <span className={`text-3xl leading-none flex-shrink-0 ${locked ? 'grayscale opacity-40' : ''}`}>
-                {world.emoji}
-              </span>
-
-              {/* Name + subtitle */}
-              <div className="flex-1 min-w-0">
-                <div className={`font-title text-xl leading-tight ${locked ? 'text-white/30' : 'text-op-ink'}`}>
+        <div className="grid grid-cols-2 gap-3">
+          {WORLDS.map((world, i) => {
+            const locked = profile.berries < world.berriesRequired
+            return (
+              <motion.button
+                key={world.id}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.08 + i * 0.03, type: 'spring', stiffness: 320 }}
+                whileTap={locked ? {} : { scale: 0.95 }}
+                onClick={() => !locked && handleWorldSelect(world.id)}
+                className={`
+                  flex flex-col items-center gap-2 px-3 py-4 rounded-2xl border-2 text-center transition-colors
+                  ${locked
+                    ? 'border-white/8 bg-white/[0.03] cursor-default'
+                    : 'border-op-ink bg-op-parchment hover:brightness-110 shadow-manga-sm'}
+                `}
+              >
+                <span className={`text-4xl leading-none ${locked ? 'grayscale opacity-30' : ''}`}>
+                  {world.emoji}
+                </span>
+                <div className={`font-title text-sm leading-tight ${locked ? 'text-white/25' : 'text-op-ink'}`}>
                   {world.label}
                 </div>
-                <div className={`font-body text-xs mt-0.5 ${locked ? 'text-white/25' : 'text-op-ink/50'}`}>
+                <div className={`font-body text-[10px] leading-tight ${locked ? 'text-white/20' : 'text-op-ink/50'}`}>
                   {locked
-                    ? `🔒 ${world.berriesRequired.toLocaleString()} ${t.berriesNeeded}`
+                    ? `🔒 ${world.berriesRequired.toLocaleString()}🍇`
                     : `${world.words.length} ${t.words}`}
                 </div>
-              </div>
-
-              {/* Right indicator */}
-              <span className={`text-lg flex-shrink-0 ${locked ? 'text-white/15' : 'text-op-ink/50'}`}>
-                {locked ? '🔒' : '▶'}
-              </span>
-            </motion.button>
-          )
-        })}
-      </div>
+              </motion.button>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

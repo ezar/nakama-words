@@ -26,10 +26,13 @@ body {
   background-color: var(--op-ocean-dark);
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
-  scrollbar-width: none;
 }
 
-body::-webkit-scrollbar { display: none; }
+/* Hide scrollbars everywhere — this is a touch-first game */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar { display: none; }
 
 /* Desktop: dot-grid background so the centred column floats */
 @media (min-width: 768px) {
