@@ -22,7 +22,7 @@ export function ResultScreen() {
   const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions, perfectBonus, newlyUnlockedWorlds } = lastResult
 
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark overflow-y-auto">
+    <div className="flex flex-col min-h-full bg-op-ocean-dark overflow-y-auto">
 
       {/* ── Rank-up overlay ── */}
       <AnimatePresence>

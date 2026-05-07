@@ -26,7 +26,7 @@ export function AchievementsScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 py-6">
+    <div className="flex flex-col min-h-full bg-op-ocean-dark px-4 py-6">
       <div className="flex items-center gap-4 mb-2">
         <button
           onClick={() => setPhase('hub')}

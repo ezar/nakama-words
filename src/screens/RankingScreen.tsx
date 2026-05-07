@@ -14,7 +14,7 @@ export function RankingScreen() {
   const sorted = [...profiles].sort((a, b) => b.berries - a.berries)
 
   return (
-    <div className="flex flex-col min-h-screen bg-op-ocean-dark px-4 py-6">
+    <div className="flex flex-col min-h-full bg-op-ocean-dark px-4 py-6">
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => setPhase('hub')}

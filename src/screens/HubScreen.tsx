@@ -38,10 +38,10 @@ export function HubScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-op-ocean-dark px-4 py-6">
+    <div className="flex flex-col h-full bg-op-ocean-dark">
 
       {/* ── Top bar ── */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
         <button
           onClick={() => setPhase('start')}
           className="font-body text-op-cyan/70 hover:text-op-cyan text-sm"
@@ -82,7 +82,7 @@ export function HubScreen() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-op-ink/20 rounded-2xl border-2 border-op-gold/30 p-4 mb-4 flex-shrink-0"
+        className="bg-op-ink/20 rounded-2xl border-2 border-op-gold/30 p-4 mx-4 mb-3 flex-shrink-0"
       >
         <div className="flex justify-between items-baseline mb-1">
           <span className="font-title text-xl text-op-gold">{profile.name}</span>
@@ -117,7 +117,7 @@ export function HubScreen() {
         onClick={dailyDone ? undefined : handleDaily}
         disabled={dailyDone}
         className={`
-          w-full mb-5 py-4 rounded-xl border-4 font-title text-2xl tracking-wide flex-shrink-0
+          mx-4 mb-3 py-3.5 rounded-xl border-4 font-title text-xl tracking-wide flex-shrink-0
           ${dailyDone
             ? 'border-white/10 text-white/25 bg-transparent cursor-default'
             : 'border-op-cyan bg-op-cyan/10 text-op-cyan hover:bg-op-cyan/20 shadow-manga'}
@@ -126,9 +126,10 @@ export function HubScreen() {
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
 
-      {/* ── World grid ── */}
-      <h2 className="font-title text-xl text-op-gold mb-3 flex-shrink-0">{t.worldSelect}</h2>
-      <div className="grid grid-cols-1 gap-2.5">
+      {/* ── World list (scrolls inside the fixed container) ── */}
+      <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+      <div className="grid grid-cols-1 gap-2">
         {WORLDS.map((world, i) => {
           const locked = profile.berries < world.berriesRequired
           return (
@@ -170,6 +171,7 @@ export function HubScreen() {
             </motion.button>
           )
         })}
+      </div>
       </div>
     </div>
   )
