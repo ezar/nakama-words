@@ -8,12 +8,19 @@ import { TimerRing } from '../components/TimerRing'
 import { OptionsGrid } from '../components/OptionsGrid'
 import { ParticleEmitter } from '../components/ParticleEmitter'
 import { soundEngine } from '../audio/SoundEngine'
+import { vibrate, HapticPattern } from '../utils/haptics'
 import { getTranslations } from '../i18n/translations'
-import { getStreakMessage } from '../utils/rankHelpers'
 import { todayString } from '../engine/rng'
 
-const ADVANCE_DELAY = 1400
+const ADVANCE_DELAY = 1600
 const QUESTION_DURATION = 10
+const PERFECT_BONUS = 50
+
+const STREAK_MILESTONES: Record<number, { label: string; color: string }> = {
+  3:  { label: '🔥 ON FIRE!',           color: 'text-orange-400' },
+  5:  { label: '⚡ GEAR SECOND!',        color: 'text-op-cyan' },
+  10: { label: '👑 GEAR THIRD — LEGENDARY!', color: 'text-op-gold' },
+}
 
 export function GameScreen() {
   const {
@@ -31,20 +38,24 @@ export function GameScreen() {
   const [timerKey, setTimerKey] = useState(0)
   const [feedbackCorrect, setFeedbackCorrect] = useState<boolean | null>(null)
   const [particleTrigger, setParticleTrigger] = useState(false)
+  const [milestoneBanner, setMilestoneBanner] = useState<string | null>(null)
+  const [milestoneColor, setMilestoneColor] = useState('text-op-gold')
+
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const shownMilestones = useRef(new Set<number>())
 
   const totalQuestions = wordQueue.length
   const isLastQuestion = currentQuestionIndex >= totalQuestions - 1
-  const streakMsg = getStreakMessage(streak)
 
   const doAdvance = useCallback(() => {
     if (isLastQuestion) {
-      const { maxStreak, correctWords } = useGameStore.getState()
+      const { maxStreak, correctWords, wordQueue: finalQueue, score: finalScore } = useGameStore.getState()
+      const perfectBonus = correctWords.length === finalQueue.length ? PERFECT_BONUS : 0
       updateMaxStreak(maxStreak)
       addCorrect(correctWords.length)
       if (isDaily) completeDaily(todayString())
-      const berriesResult = addBerries(useGameStore.getState().score)
-      finishRound(berriesResult)
+      const berriesResult = addBerries(finalScore + perfectBonus)
+      finishRound({ ...berriesResult, perfectBonus })
     } else {
       advanceQuestion()
       setSelected(null)
@@ -64,12 +75,24 @@ export function GameScreen() {
 
     if (correct) {
       soundEngine.playCorrect()
+      vibrate(HapticPattern.correct)
       setParticleTrigger(true)
       setTimeout(() => setParticleTrigger(false), 50)
+
       const { streak: newStreak } = useGameStore.getState()
       if (newStreak >= 5) soundEngine.playStreak()
+
+      const milestone = STREAK_MILESTONES[newStreak]
+      if (milestone && !shownMilestones.current.has(newStreak)) {
+        shownMilestones.current.add(newStreak)
+        vibrate(HapticPattern.streak)
+        setMilestoneBanner(milestone.label)
+        setMilestoneColor(milestone.color)
+        setTimeout(() => setMilestoneBanner(null), 1800)
+      }
     } else {
       soundEngine.playWrong()
+      vibrate(HapticPattern.wrong)
     }
 
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
@@ -82,17 +105,16 @@ export function GameScreen() {
     setFeedbackCorrect(false)
     answerQuestion('')
     soundEngine.playWrong()
+    vibrate(HapticPattern.wrong)
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
   }, [selected, answerQuestion, doAdvance])
 
-  // Keyboard: 1–4
+  // Keyboard 1–4
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!currentQuestion) return
       const idx = ['1', '2', '3', '4'].indexOf(e.key)
-      if (idx !== -1 && currentQuestion.options[idx]) {
-        handleSelect(currentQuestion.options[idx]!)
-      }
+      if (idx !== -1 && currentQuestion.options[idx]) handleSelect(currentQuestion.options[idx]!)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -110,22 +132,41 @@ export function GameScreen() {
 
   if (!currentQuestion) return null
 
+  const answeredCount = currentQuestionIndex + (selected !== null ? 1 : 0)
+
   return (
     <div className="flex flex-col h-screen bg-op-ocean-dark px-4 pt-5 pb-6">
       <ParticleEmitter trigger={particleTrigger} />
 
-      {/* ── TOP BAR ── */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+      {/* Streak milestone banner */}
+      <AnimatePresence>
+        {milestoneBanner && (
+          <motion.div
+            initial={{ y: -60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -60, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            className="fixed top-0 inset-x-0 z-50 flex justify-center pt-safe pt-3 pointer-events-none"
+          >
+            <div className={`bg-op-ocean-dark border-4 border-op-gold rounded-2xl px-6 py-3 shadow-manga font-title text-2xl ${milestoneColor}`}>
+              {milestoneBanner}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── TOP BAR: streak + score ── */}
+      <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <AnimatePresence mode="wait">
           <motion.span
-            key={streakMsg}
+            key={streak}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 8 }}
             className="font-body text-sm text-op-gold"
             aria-live="polite"
           >
-            {streakMsg}
+            {streak > 0 ? `🔥 ×${streak}` : '🎯 Ready!'}
           </motion.span>
         </AnimatePresence>
         <motion.div
@@ -139,10 +180,29 @@ export function GameScreen() {
         </motion.div>
       </div>
 
-      {/* ── MIDDLE: card + timer/feedback centrados juntos ── */}
-      <div className="flex-1 flex flex-col justify-center gap-5 min-h-0">
+      {/* ── PROGRESS DOTS ── */}
+      <div className="flex gap-1.5 justify-center mb-3 flex-shrink-0">
+        {Array.from({ length: totalQuestions }).map((_, i) => {
+          const done    = i < answeredCount
+          const current = i === currentQuestionIndex && selected === null
+          return (
+            <motion.div
+              key={i}
+              animate={current ? { scale: [1, 1.4, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+              className={`rounded-full transition-all duration-300 ${
+                done    ? 'w-2.5 h-2.5 bg-op-green' :
+                current ? 'w-2.5 h-2.5 bg-op-gold' :
+                          'w-2 h-2 bg-white/20'
+              }`}
+            />
+          )
+        })}
+      </div>
 
-        {/* Word card */}
+      {/* ── MIDDLE: card + timer/feedback ── */}
+      <div className="flex-1 flex flex-col justify-center gap-4 min-h-0">
+
         <AnimatePresence mode="wait">
           <WordCard
             key={currentQuestionIndex}
@@ -152,15 +212,17 @@ export function GameScreen() {
           />
         </AnimatePresence>
 
-        {/* Timer + Feedback apilados y centrados */}
-        <div className="flex flex-col items-center gap-3">
+        {/* Timer + feedback stacked & centered */}
+        <div className="flex flex-col items-center gap-2">
           <TimerRing
             key={timerKey}
             duration={QUESTION_DURATION}
             onTimeout={handleTimeout}
             running={timerRunning}
           />
-          <div className="h-12 flex items-center justify-center w-full">
+
+          {/* Fixed-height feedback area — never shifts layout */}
+          <div className="h-14 flex flex-col items-center justify-center gap-1">
             <AnimatePresence>
               {feedbackCorrect !== null && (
                 <motion.div
@@ -168,25 +230,37 @@ export function GameScreen() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.8, opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-                  className={`
-                    px-8 py-2 rounded-2xl border-4 font-title text-2xl text-center
-                    ${feedbackCorrect
+                  className={`px-8 py-1.5 rounded-2xl border-4 font-title text-2xl text-center ${
+                    feedbackCorrect
                       ? 'border-op-green text-op-green bg-op-green/10'
-                      : 'border-op-red text-op-red bg-op-red/10'}
-                  `}
+                      : 'border-op-red text-op-red bg-op-red/10'
+                  }`}
                   aria-live="assertive"
                 >
                   {feedbackCorrect ? '✓ ' + t.correct : '✗ ' + t.wrong}
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Correct answer revealed after a wrong/timeout */}
+            <AnimatePresence>
+              {feedbackCorrect === false && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="font-title text-lg text-op-green"
+                >
+                  ✓ {currentQuestion.correctAnswer}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-
       </div>
 
-      {/* ── BOTTOM: opciones + label ── */}
-      <div className="flex-shrink-0 flex flex-col gap-3 mt-4">
+      {/* ── BOTTOM: options + label ── */}
+      <div className="flex-shrink-0 flex flex-col gap-3 mt-3">
         <OptionsGrid
           options={currentQuestion.options}
           correctAnswer={currentQuestion.correctAnswer}

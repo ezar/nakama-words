@@ -16,11 +16,13 @@ export function TimerRing({ duration, onTimeout, running }: TimerRingProps) {
   const startRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
   const calledRef = useRef(false)
+  const lastTickSecRef = useRef(-1)
 
   useEffect(() => {
     setTimeLeft(duration)
     calledRef.current = false
     startRef.current = null
+    lastTickSecRef.current = -1
   }, [duration, running])
 
   useEffect(() => {
@@ -35,8 +37,10 @@ export function TimerRing({ duration, onTimeout, running }: TimerRingProps) {
       const remaining = Math.max(0, duration - elapsed)
       setTimeLeft(remaining)
 
-      // Tick sound in last 3 seconds
-      if (remaining <= 3 && remaining > 0 && Math.floor(remaining) !== Math.floor(remaining + 0.016)) {
+      // Tick sound: once per integer second in the last 3 seconds
+      const tickSec = Math.ceil(remaining)
+      if (remaining <= 3 && remaining > 0 && tickSec !== lastTickSecRef.current) {
+        lastTickSecRef.current = tickSec
         soundEngine.playTick()
       }
 

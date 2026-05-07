@@ -2,7 +2,7 @@ import { mulberry32, dateToSeed } from '../engine/rng'
 import type { WordEntry } from '../data/words'
 import { WORLDS } from '../data/words'
 
-export const DAILY_QUESTION_COUNT = 5
+export const DAILY_QUESTION_COUNT = 8
 export const DAILY_BERRY_MULTIPLIER = 3
 
 export function getDailyWords(yyyymmdd: string): WordEntry[] {

@@ -37,8 +37,19 @@ export function AchievementsScreen() {
         <h1 className="font-title text-3xl text-op-gold">{t.achievements}</h1>
       </div>
 
-      <div className="font-body text-sm text-op-cyan/60 mb-5">
-        {count} / {total} unlocked
+      <div className="mb-5">
+        <div className="flex justify-between font-body text-xs text-op-cyan/60 mb-1.5">
+          <span>{count} / {total} unlocked</span>
+          <span>{Math.round((count / total) * 100)}%</span>
+        </div>
+        <div className="h-2.5 rounded-full bg-op-ink/40 overflow-hidden border border-op-ink/60">
+          <motion.div
+            className="h-full bg-op-gold rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${(count / total) * 100}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 overflow-y-auto">

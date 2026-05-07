@@ -1,4 +1,5 @@
 import type { World, WordEntry } from '../data/words'
+import { WORLDS } from '../data/words'
 import type { RNG } from './rng'
 
 export interface Question {
@@ -16,6 +17,10 @@ function shuffleArray<T>(arr: T[], rng: RNG): T[] {
     a[j] = tmp!
   }
   return a
+}
+
+export function findWorldForEntry(entry: WordEntry): World {
+  return WORLDS.find(w => w.words.some(e => e.en === entry.en)) ?? WORLDS[0]!
 }
 
 export function generateQuestion(

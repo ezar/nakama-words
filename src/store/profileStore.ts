@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { WorldId } from '../data/words'
+import { WORLDS } from '../data/words'
 import { checkNewAchievements } from '../utils/achievementHelpers'
 import { getRankForBerries } from '../utils/rankHelpers'
 
@@ -26,7 +27,7 @@ interface ProfileState {
   deleteProfile: (id: string) => void
   getActiveProfile: () => Profile | null
 
-  addBerries: (amount: number) => { newAchievements: string[]; rankedUp: boolean; newRankLabel: string }
+  addBerries: (amount: number) => { newAchievements: string[]; rankedUp: boolean; newRankLabel: string; newlyUnlockedWorlds: WorldId[] }
   addCorrect: (count: number) => void
   updateMaxStreak: (streak: number) => void
   unlockWorld: (worldId: WorldId) => void
@@ -76,12 +77,16 @@ export const useProfileStore = create<ProfileState>()(
       addBerries: (amount) => {
         const { profiles, activeProfileId } = get()
         const profile = profiles.find(p => p.id === activeProfileId)
-        if (!profile) return { newAchievements: [], rankedUp: false, newRankLabel: '' }
+        if (!profile) return { newAchievements: [], rankedUp: false, newRankLabel: '', newlyUnlockedWorlds: [] }
 
         const oldRank = getRankForBerries(profile.berries)
         const newBerries = profile.berries + amount
         const newRank = getRankForBerries(newBerries)
         const rankedUp = newRank.rank > oldRank.rank
+
+        const newlyUnlockedWorlds = WORLDS
+          .filter(w => w.berriesRequired > 0 && profile.berries < w.berriesRequired && newBerries >= w.berriesRequired)
+          .map(w => w.id)
 
         const newAchievements = checkNewAchievements({
           berries: newBerries,
@@ -101,7 +106,7 @@ export const useProfileStore = create<ProfileState>()(
           ),
         }))
 
-        return { newAchievements, rankedUp, newRankLabel: newRank.label }
+        return { newAchievements, rankedUp, newRankLabel: newRank.label, newlyUnlockedWorlds }
       },
 
       addCorrect: (count) =>

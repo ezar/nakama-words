@@ -6,6 +6,7 @@ import { StarRating } from '../components/StarRating'
 import { getTranslations } from '../i18n/translations'
 import { soundEngine } from '../audio/SoundEngine'
 import { ACHIEVEMENT_MAP } from '../config/achievements'
+import { WORLD_MAP } from '../data/words'
 
 export function ResultScreen() {
   const { lastResult, setPhase, currentWorldId, resetRound, newAchievements, rankedUp, newRankLabel } = useGameStore()
@@ -18,7 +19,7 @@ export function ResultScreen() {
 
   if (!lastResult) { setPhase('hub'); return null }
 
-  const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions } = lastResult
+  const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions, perfectBonus, newlyUnlockedWorlds } = lastResult
 
   return (
     <div className="flex flex-col min-h-screen bg-op-ocean-dark overflow-y-auto">
@@ -70,8 +71,12 @@ export function ResultScreen() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
-          <div className="text-6xl mb-3">🏴‍☠️</div>
-          <h1 className="font-title text-4xl text-op-gold tracking-widest">{t.roundComplete}</h1>
+          <div className="text-6xl mb-3">
+            {perfectBonus > 0 ? '🌟' : '🏴‍☠️'}
+          </div>
+          <h1 className="font-title text-4xl text-op-gold tracking-widest">
+            {perfectBonus > 0 ? t.perfectRound : t.roundComplete}
+          </h1>
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -93,19 +98,29 @@ export function ResultScreen() {
           className="grid grid-cols-3 gap-3"
         >
           {[
-            { value: score,                  label: 'Puntos',        color: 'text-white',     icon: '⭐' },
-            { value: `🍇 ${berriesEarned}`,  label: t.berriesEarned, color: 'text-op-gold',   icon: null },
-            { value: `🔥 ${maxStreak}`,       label: 'Mejor racha',   color: 'text-op-cyan',   icon: null },
+            { value: score,                  label: t.points,        color: 'text-white'   },
+            { value: `🍇 ${berriesEarned}`,  label: t.berriesEarned, color: 'text-op-gold' },
+            { value: `🔥 ${maxStreak}`,       label: t.bestStreak,    color: 'text-op-cyan' },
           ].map((stat, i) => (
-            <div
-              key={i}
-              className="bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-2 text-center"
-            >
+            <div key={i} className="bg-white/5 border-2 border-white/10 rounded-2xl py-4 px-2 text-center">
               <div className={`font-title text-2xl ${stat.color} leading-tight`}>{stat.value}</div>
               <div className="font-body text-[10px] text-white/40 mt-1">{stat.label}</div>
             </div>
           ))}
         </motion.div>
+
+        {/* ── Perfect round bonus ── */}
+        {perfectBonus > 0 && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400 }}
+            className="border-4 border-op-gold bg-op-gold/15 rounded-2xl p-4 text-center"
+          >
+            <div className="font-title text-2xl text-op-gold">🌟 {t.perfectRound}</div>
+            <div className="font-body text-sm text-op-gold/70 mt-1">+{perfectBonus} {t.perfectBonus} 🍇</div>
+          </motion.div>
+        )}
 
         {/* ── Correct / wrong count bar ── */}
         <motion.div
@@ -128,6 +143,29 @@ export function ResultScreen() {
             {wrongWords.length > 0 && `✗ ${wrongWords.length}`}
           </div>
         </motion.div>
+
+        {/* ── Newly unlocked worlds ── */}
+        {newlyUnlockedWorlds.length > 0 && (
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.28 }}
+            className="border-2 border-op-cyan/50 bg-op-cyan/10 rounded-2xl p-4"
+          >
+            <div className="font-title text-lg text-op-cyan mb-3">🔓 {t.newWorldsUnlocked}</div>
+            <div className="flex flex-col gap-2">
+              {newlyUnlockedWorlds.map(wId => {
+                const world = WORLD_MAP[wId]
+                return (
+                  <div key={wId} className="flex items-center gap-3 bg-op-cyan/10 rounded-xl px-3 py-2">
+                    <span className="text-2xl">{world.emoji}</span>
+                    <span className="font-title text-base text-op-cyan">{world.name}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {/* ── New achievements ── */}
         {newAchievements.length > 0 && (
@@ -193,7 +231,7 @@ export function ResultScreen() {
             transition={{ delay: 0.4 }}
             className="border-2 border-op-red/30 bg-op-red/5 rounded-2xl p-4"
           >
-            <div className="font-title text-lg text-op-red mb-3">✗ Practica más</div>
+            <div className="font-title text-lg text-op-red mb-3">✗ {t.practiceMore}</div>
             <div className="flex flex-col gap-2">
               {wrongWords.map((w, i) => (
                 <motion.div

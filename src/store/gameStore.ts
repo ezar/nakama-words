@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { WorldId, WordEntry } from '../data/words'
 import type { Question } from '../engine/QuestionEngine'
-import { generateQuestion, buildRound } from '../engine/QuestionEngine'
+import { generateQuestion, buildRound, findWorldForEntry } from '../engine/QuestionEngine'
 import { WORLD_MAP } from '../data/words'
 import { calcQuestionScore } from '../utils/rankHelpers'
 import { getDailyWords, DAILY_BERRY_MULTIPLIER } from '../config/daily'
@@ -16,6 +16,8 @@ export interface RoundResult {
   correctWords: WordEntry[]
   wrongWords: WordEntry[]
   totalQuestions: number
+  perfectBonus: number
+  newlyUnlockedWorlds: WorldId[]
 }
 
 interface GameState {
@@ -40,7 +42,7 @@ interface GameState {
   loadQuestion: () => void
   answerQuestion: (answer: string) => boolean
   advanceQuestion: () => void
-  finishRound: (berriesResult: { newAchievements: string[]; rankedUp: boolean; newRankLabel: string }) => void
+  finishRound: (berriesResult: { newAchievements: string[]; rankedUp: boolean; newRankLabel: string; newlyUnlockedWorlds: WorldId[]; perfectBonus: number }) => void
   resetRound: () => void
   setNewAchievements: (ids: string[]) => void
 }
@@ -74,7 +76,9 @@ export const useGameStore = create<GameState>()((set, get) => ({
       words = buildRound(world)
     }
 
-    const firstQuestion = generateQuestion(world, words[0]!)
+    const firstEntry = words[0]!
+    const firstWorld = isDaily ? findWorldForEntry(firstEntry) : world
+    const firstQuestion = generateQuestion(firstWorld, firstEntry)
 
     set({
       phase: 'game',
@@ -125,15 +129,15 @@ export const useGameStore = create<GameState>()((set, get) => ({
   },
 
   advanceQuestion: () => {
-    const { currentQuestionIndex, wordQueue, currentWorldId } = get()
+    const { currentQuestionIndex, wordQueue, currentWorldId, isDaily } = get()
     const nextIndex = currentQuestionIndex + 1
 
     if (nextIndex >= wordQueue.length || !currentWorldId) {
       return
     }
 
-    const world = WORLD_MAP[currentWorldId]
     const nextEntry = wordQueue[nextIndex]!
+    const world = isDaily ? findWorldForEntry(nextEntry) : WORLD_MAP[currentWorldId]
     const nextQuestion = generateQuestion(world, nextEntry)
 
     set({
@@ -145,7 +149,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   finishRound: (berriesResult) => {
     const { score, maxStreak, correctWords, wrongWords, wordQueue, isDaily } = get()
     const multiplier = isDaily ? DAILY_BERRY_MULTIPLIER : 1
-    const berriesEarned = score * multiplier
+    const berriesEarned = (score + berriesResult.perfectBonus) * multiplier
 
     set({
       phase: 'result',
@@ -156,6 +160,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
         correctWords,
         wrongWords,
         totalQuestions: wordQueue.length,
+        perfectBonus: berriesResult.perfectBonus,
+        newlyUnlockedWorlds: berriesResult.newlyUnlockedWorlds,
       },
       newAchievements: berriesResult.newAchievements,
       rankedUp: berriesResult.rankedUp,
