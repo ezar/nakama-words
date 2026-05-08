@@ -36,6 +36,7 @@ const T = {
     perfectBonus: 'bonus berries',
     newWorldsUnlocked: 'New Worlds Unlocked!',
     words: 'words',
+    learnIn: 'Learn in',
   },
   es: {
     appName: 'Cazador de Palabras',
@@ -72,6 +73,7 @@ const T = {
     perfectBonus: 'berries de bonus',
     newWorldsUnlocked: '¡Nuevos mundos desbloqueados!',
     words: 'palabras',
+    learnIn: 'Aprender en',
   },
   ca: {
     appName: 'Caçador de Paraules',
@@ -108,6 +110,7 @@ const T = {
     perfectBonus: 'berries de bonus',
     newWorldsUnlocked: 'Nous mons desbloquejats!',
     words: 'paraules',
+    learnIn: 'Aprendre en',
   },
 } as const
 

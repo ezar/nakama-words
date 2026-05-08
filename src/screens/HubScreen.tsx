@@ -12,7 +12,7 @@ const LANGS: Lang[] = ['en', 'es', 'ca']
 export function HubScreen() {
   const { getActiveProfile } = useProfileStore()
   const { setPhase, startRound } = useGameStore()
-  const { language, setLanguage, toggleSound, soundEnabled } = useSettingsStore()
+  const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang } = useSettingsStore()
   const t = getTranslations(language)
 
   const profile = getActiveProfile()
@@ -62,6 +62,19 @@ export function HubScreen() {
           >
             {soundEnabled ? '🔊' : '🔇'}
           </button>
+          <div className="flex gap-0.5 border border-white/10 rounded p-0.5">
+            {(['es', 'ca'] as const).map(l => (
+              <button
+                key={l}
+                onClick={() => setLearnLang(l)}
+                className={`font-body text-[10px] px-1.5 py-0.5 rounded uppercase transition-colors ${
+                  l === learnLang ? 'text-op-cyan bg-op-cyan/20' : 'text-white/30 hover:text-white/60'
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
           <div className="flex gap-0.5">
             {LANGS.map(l => (
               <button

@@ -10,7 +10,7 @@ import { WORLD_MAP } from '../data/words'
 
 export function ResultScreen() {
   const { lastResult, setPhase, currentWorldId, resetRound, newAchievements, rankedUp, newRankLabel } = useGameStore()
-  const { language } = useSettingsStore()
+  const { language, learnLang } = useSettingsStore()
   const t = getTranslations(language)
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export function ResultScreen() {
                       <span className="text-lg">{w.icon}</span>
                       {w.en}
                     </span>
-                    <span className="font-title text-base text-op-green">→ {w.es}</span>
+                    <span className="font-title text-base text-op-green">→ {w[learnLang] ?? w.es}</span>
                   </motion.div>
                 ))}
               </div>
@@ -248,7 +248,7 @@ export function ResultScreen() {
                       <span className="text-lg">{w.icon}</span>
                       {w.en}
                     </span>
-                    <span className="font-title text-base text-op-red/80">→ {w.es}</span>
+                    <span className="font-title text-base text-op-red/80">→ {w[learnLang] ?? w.es}</span>
                   </motion.div>
                 ))}
               </div>

@@ -3,6 +3,7 @@ import type { WorldId, WordEntry } from '../data/words'
 import type { Question } from '../engine/QuestionEngine'
 import { generateQuestion, buildRound, findWorldForEntry } from '../engine/QuestionEngine'
 import { WORLD_MAP } from '../data/words'
+import { useSettingsStore } from './settingsStore'
 import { calcQuestionScore } from '../utils/rankHelpers'
 import { getDailyWords, DAILY_BERRY_MULTIPLIER } from '../config/daily'
 import { todayString } from '../engine/rng'
@@ -78,7 +79,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
     const firstEntry = words[0]!
     const firstWorld = isDaily ? findWorldForEntry(firstEntry) : world
-    const firstQuestion = generateQuestion(firstWorld, firstEntry)
+    const learnLang = useSettingsStore.getState().learnLang
+    const firstQuestion = generateQuestion(firstWorld, firstEntry, Math.random, learnLang)
 
     set({
       phase: 'game',
@@ -101,7 +103,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
     const world = WORLD_MAP[currentWorldId]
     const entry = wordQueue[currentQuestionIndex]
     if (!entry) return
-    const question = generateQuestion(world, entry)
+    const learnLang = useSettingsStore.getState().learnLang
+    const question = generateQuestion(world, entry, Math.random, learnLang)
     set({ currentQuestion: question })
   },
 
@@ -138,7 +141,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
     const nextEntry = wordQueue[nextIndex]!
     const world = isDaily ? findWorldForEntry(nextEntry) : WORLD_MAP[currentWorldId]
-    const nextQuestion = generateQuestion(world, nextEntry)
+    const learnLang = useSettingsStore.getState().learnLang
+    const nextQuestion = generateQuestion(world, nextEntry, Math.random, learnLang)
 
     set({
       currentQuestionIndex: nextIndex,

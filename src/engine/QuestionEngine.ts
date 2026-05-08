@@ -1,4 +1,4 @@
-import type { World, WordEntry } from '../data/words'
+import type { World, WordEntry, TargetLang } from '../data/words'
 import { WORLDS } from '../data/words'
 import type { RNG } from './rng'
 
@@ -27,17 +27,19 @@ export function generateQuestion(
   world: World,
   correctEntry: WordEntry,
   rng: RNG = Math.random,
+  learnLang: TargetLang = 'es',
 ): Question {
-  const pool = world.words.filter(w => w.es !== correctEntry.es)
+  const correctTrans = correctEntry[learnLang] ?? correctEntry.es
+  const pool = world.words.filter(w => (w[learnLang] ?? w.es) !== correctTrans)
   const shuffledPool = shuffleArray(pool, rng)
-  const distractors = shuffledPool.slice(0, 3).map(w => w.es)
+  const distractors = shuffledPool.slice(0, 3).map(w => w[learnLang] ?? w.es)
 
-  const options = shuffleArray([correctEntry.es, ...distractors], rng)
+  const options = shuffleArray([correctTrans, ...distractors], rng)
 
   return {
     prompt: correctEntry,
     options,
-    correctAnswer: correctEntry.es,
+    correctAnswer: correctTrans,
   }
 }
 

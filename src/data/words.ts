@@ -6,9 +6,12 @@ export type WorldId =
 export interface WordEntry {
   en: string
   es: string
+  ca?: string
   hint: string
   icon: string
 }
+
+export type TargetLang = 'es' | 'ca'
 
 export interface World {
   id: WorldId
