@@ -37,6 +37,9 @@ const T = {
     newWorldsUnlocked: 'New Worlds Unlocked!',
     words: 'words',
     learnIn: 'Learn in',
+    settings: 'Settings',
+    uiLanguage: 'Interface',
+    sound: 'Sound',
   },
   es: {
     appName: 'Cazador de Palabras',
@@ -74,6 +77,9 @@ const T = {
     newWorldsUnlocked: '¡Nuevos mundos desbloqueados!',
     words: 'palabras',
     learnIn: 'Aprender en',
+    settings: 'Ajustes',
+    uiLanguage: 'Interfaz',
+    sound: 'Sonido',
   },
   ca: {
     appName: 'Caçador de Paraules',
@@ -111,6 +117,9 @@ const T = {
     newWorldsUnlocked: 'Nous mons desbloquejats!',
     words: 'paraules',
     learnIn: 'Aprendre en',
+    settings: 'Configuració',
+    uiLanguage: 'Interfície',
+    sound: 'So',
   },
 } as const
 

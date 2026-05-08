@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useProfileStore } from '../store/profileStore'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
@@ -14,6 +15,8 @@ export function HubScreen() {
   const { setPhase, startRound } = useGameStore()
   const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang } = useSettingsStore()
   const t = getTranslations(language)
+
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const profile = getActiveProfile()
   if (!profile) {
@@ -33,12 +36,105 @@ export function HubScreen() {
     startRound(worldId, false)
   }
 
-  const handleDaily = () => {
-    startRound('animals', true)
-  }
-
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark">
+
+      {/* ── Settings bottom sheet ── */}
+      <AnimatePresence>
+        {settingsOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSettingsOpen(false)}
+              className="fixed inset-0 bg-black/60 z-40"
+            />
+            {/* Panel */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 380, damping: 36 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d2d4a] border-t-4 border-op-gold/40 rounded-t-3xl px-6 pb-8 pt-5 md:w-[500px] md:mx-auto"
+            >
+              {/* Handle */}
+              <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5" />
+
+              <h2 className="font-title text-2xl text-op-gold mb-5">⚙️ {t.settings}</h2>
+
+              <div className="flex flex-col gap-4">
+
+                {/* Sound */}
+                <div className="flex items-center justify-between py-3 border-b border-white/8">
+                  <span className="font-body text-base text-white/70">{t.sound}</span>
+                  <button
+                    onClick={toggleSound}
+                    className={`relative w-14 h-7 rounded-full border-2 transition-colors ${
+                      soundEnabled ? 'bg-op-cyan/20 border-op-cyan' : 'bg-white/5 border-white/20'
+                    }`}
+                  >
+                    <motion.div
+                      animate={{ x: soundEnabled ? 28 : 4 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      className={`absolute top-0.5 w-5 h-5 rounded-full ${soundEnabled ? 'bg-op-cyan' : 'bg-white/30'}`}
+                    />
+                  </button>
+                </div>
+
+                {/* UI Language */}
+                <div className="flex items-center justify-between py-3 border-b border-white/8">
+                  <span className="font-body text-base text-white/70">{t.uiLanguage}</span>
+                  <div className="flex gap-1">
+                    {LANGS.map(l => (
+                      <button
+                        key={l}
+                        onClick={() => setLanguage(l)}
+                        className={`font-title text-sm px-3 py-1.5 rounded-xl border-2 uppercase transition-colors ${
+                          l === language
+                            ? 'border-op-gold bg-op-gold/20 text-op-gold'
+                            : 'border-white/15 text-white/40 hover:text-white/70'
+                        }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Learn Language */}
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body text-base text-white/70">{t.learnIn}</span>
+                  <div className="flex gap-1">
+                    {(['es', 'ca'] as const).map(l => (
+                      <button
+                        key={l}
+                        onClick={() => setLearnLang(l)}
+                        className={`font-title text-sm px-3 py-1.5 rounded-xl border-2 uppercase transition-colors ${
+                          l === learnLang
+                            ? 'border-op-cyan bg-op-cyan/20 text-op-cyan'
+                            : 'border-white/15 text-white/40 hover:text-white/70'
+                        }`}
+                      >
+                        {l === 'es' ? '🇪🇸 ES' : '🏴󠁥󠁳󠁣󠁴󠁿 CA'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              <button
+                onClick={() => setSettingsOpen(false)}
+                className="mt-6 w-full py-3.5 rounded-2xl border-4 border-op-gold/40 text-op-gold font-title text-xl"
+              >
+                ✓ {t.back}
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
@@ -56,38 +152,12 @@ export function HubScreen() {
             {t.ranking}
           </button>
           <button
-            onClick={toggleSound}
-            title={soundEnabled ? t.soundOn : t.soundOff}
-            className="font-body text-sm text-op-cyan/50 hover:text-op-cyan"
+            onClick={() => setSettingsOpen(true)}
+            className="font-body text-lg text-white/50 hover:text-white transition-colors"
+            title={t.settings}
           >
-            {soundEnabled ? '🔊' : '🔇'}
+            ⚙️
           </button>
-          <div className="flex gap-0.5 border border-white/10 rounded p-0.5">
-            {(['es', 'ca'] as const).map(l => (
-              <button
-                key={l}
-                onClick={() => setLearnLang(l)}
-                className={`font-body text-[10px] px-1.5 py-0.5 rounded uppercase transition-colors ${
-                  l === learnLang ? 'text-op-cyan bg-op-cyan/20' : 'text-white/30 hover:text-white/60'
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-0.5">
-            {LANGS.map(l => (
-              <button
-                key={l}
-                onClick={() => setLanguage(l)}
-                className={`font-body text-[10px] px-1.5 py-0.5 rounded uppercase transition-colors ${
-                  l === language ? 'text-op-gold bg-op-gold/20' : 'text-white/30 hover:text-white/60'
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -127,7 +197,7 @@ export function HubScreen() {
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        onClick={dailyDone ? undefined : handleDaily}
+        onClick={dailyDone ? undefined : () => startRound('animals', true)}
         disabled={dailyDone}
         className={`
           mx-4 mb-3 py-3.5 rounded-xl border-4 font-title text-xl tracking-wide flex-shrink-0
@@ -139,7 +209,7 @@ export function HubScreen() {
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
 
-      {/* ── World list (scrolls inside the fixed container) ── */}
+      {/* ── World list ── */}
       <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="grid grid-cols-2 gap-3">
