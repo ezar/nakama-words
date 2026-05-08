@@ -215,6 +215,10 @@ export function HubScreen() {
         <div className="grid grid-cols-2 gap-3">
           {WORLDS.map((world, i) => {
             const locked = profile.berries < world.berriesRequired
+            const learnedKeys = (profile.wordProgress ?? {})[learnLang]?.[world.id] ?? []
+            const learnedCount = learnedKeys.length
+            const totalWords = world.words.length
+            const mastered = !locked && learnedCount >= totalWords
             return (
               <motion.button
                 key={world.id}
@@ -227,7 +231,9 @@ export function HubScreen() {
                   flex flex-col items-center gap-2 px-3 py-4 rounded-2xl border-2 text-center transition-colors
                   ${locked
                     ? 'border-white/8 bg-white/[0.03] cursor-default'
-                    : 'border-op-ink bg-op-parchment hover:brightness-110 shadow-manga-sm'}
+                    : mastered
+                      ? 'border-op-green bg-op-parchment hover:brightness-110 shadow-manga-sm'
+                      : 'border-op-ink bg-op-parchment hover:brightness-110 shadow-manga-sm'}
                 `}
               >
                 <span className={`text-4xl leading-none ${locked ? 'grayscale opacity-30' : ''}`}>
@@ -236,11 +242,23 @@ export function HubScreen() {
                 <div className={`font-title text-sm leading-tight ${locked ? 'text-white/25' : 'text-op-ink'}`}>
                   {world.label}
                 </div>
-                <div className={`font-body text-[10px] leading-tight ${locked ? 'text-white/20' : 'text-op-ink/50'}`}>
-                  {locked
-                    ? `🔒 ${world.berriesRequired.toLocaleString()}🍇`
-                    : `${world.words.length} ${t.words}`}
-                </div>
+                {locked ? (
+                  <div className="font-body text-[10px] leading-tight text-white/20">
+                    {`🔒 ${world.berriesRequired.toLocaleString()}🍇`}
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-full h-1 rounded-full bg-op-ink/20 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${mastered ? 'bg-op-green' : 'bg-op-cyan'}`}
+                        style={{ width: `${(learnedCount / totalWords) * 100}%` }}
+                      />
+                    </div>
+                    <div className={`font-body text-[10px] leading-tight ${mastered ? 'text-op-green' : 'text-op-ink/50'}`}>
+                      {mastered ? '✓ mastered' : `${learnedCount}/${totalWords}`}
+                    </div>
+                  </>
+                )}
               </motion.button>
             )
           })}

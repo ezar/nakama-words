@@ -29,7 +29,7 @@ export function GameScreen() {
     answerQuestion, advanceQuestion, finishRound,
   } = useGameStore()
 
-  const { addBerries, addCorrect, updateMaxStreak, completeDaily } = useProfileStore()
+  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned } = useProfileStore()
   const { language } = useSettingsStore()
   const t = getTranslations(language)
 
@@ -54,6 +54,10 @@ export function GameScreen() {
       updateMaxStreak(maxStreak)
       addCorrect(correctWords.length)
       if (isDaily) completeDaily(todayString())
+      if (!isDaily && currentWorldId) {
+        const { learnLang } = useSettingsStore.getState()
+        markWordsLearned(currentWorldId, learnLang, correctWords.map(w => w.en))
+      }
       const berriesResult = addBerries(finalScore + perfectBonus)
       finishRound({ ...berriesResult, perfectBonus })
     } else {

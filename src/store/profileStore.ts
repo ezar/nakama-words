@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { WorldId } from '../data/words'
+import type { WorldId, TargetLang } from '../data/words'
 import { WORLDS } from '../data/words'
 import { checkNewAchievements } from '../utils/achievementHelpers'
 import { getRankForBerries } from '../utils/rankHelpers'
@@ -16,6 +16,7 @@ export interface Profile {
   unlockedWorlds: WorldId[]
   achievements: string[]
   createdAt: number
+  wordProgress: Partial<Record<TargetLang, Partial<Record<WorldId, string[]>>>>
 }
 
 interface ProfileState {
@@ -33,6 +34,7 @@ interface ProfileState {
   unlockWorld: (worldId: WorldId) => void
   completeDaily: (dateStr: string) => void
   grantAchievements: (ids: string[]) => void
+  markWordsLearned: (worldId: WorldId, lang: TargetLang, wordKeys: string[]) => void
 }
 
 function createEmptyProfile(name: string): Profile {
@@ -47,6 +49,7 @@ function createEmptyProfile(name: string): Profile {
     unlockedWorlds: ['animals'],
     achievements: [],
     createdAt: Date.now(),
+    wordProgress: {},
   }
 }
 
@@ -155,6 +158,18 @@ export const useProfileStore = create<ProfileState>()(
               ? { ...p, achievements: [...new Set([...p.achievements, ...ids])] }
               : p
           ),
+        })),
+
+      markWordsLearned: (worldId, lang, wordKeys) =>
+        set(s => ({
+          profiles: s.profiles.map(p => {
+            if (p.id !== s.activeProfileId) return p
+            const progress = p.wordProgress ?? {}
+            const langProgress = progress[lang] ?? {}
+            const existing = langProgress[worldId] ?? []
+            const merged = [...new Set([...existing, ...wordKeys])]
+            return { ...p, wordProgress: { ...progress, [lang]: { ...langProgress, [worldId]: merged } } }
+          }),
         })),
     }),
     { name: 'ph-profiles' },
