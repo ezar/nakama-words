@@ -1,20 +1,23 @@
 # 🏴‍☠️ Palabra Hunter
 
-A pirate-themed Spanish vocabulary game built for kids. Learn 320+ English→Spanish words across 15 worlds, earn Berries, climb the ranks, and complete daily challenges.
+A pirate-themed vocabulary game for kids. Learn 315 words in Spanish or Catalan starting from English across 15 thematic worlds, earn Berries, climb the pirate ranks, and complete daily challenges.
 
 ## Features
 
-- **320 words** across 15 thematic worlds (Animals, Food, Colors, Family, Body, Numbers, Clothes, House, School, Nature, Fruits, Vegetables, Sports, Emotions, Actions)
-- **Multiple-choice flashcards** — 4 options, 10-second timer per question
+- **315 words** across 15 thematic worlds (Animals, Food, Colors, Family, Body, Numbers, Clothes, House, School, Nature, Fruits, Vegetables, Sports, Emotions, Actions)
+- **Dual learning language** — switch between English→Spanish and English→Catalan at any time; progress tracked separately per language per world
+- **Multiple-choice flashcards** — 4 options, 10-second timer per question, 10 words per round
 - **Berry economy** — score multiplies with streak (×1.5 at 3, ×2 at 5, ×3 at 10)
 - **Daily challenge** — seeded random 8-word mix across all worlds, ×3 berry multiplier
 - **8 pirate ranks** — Cabin Boy → Pirate King
 - **29 achievements** across streak, volume, world, consistency, and rank categories
 - **Streak milestone banners** — ON FIRE! / GEAR SECOND! / GEAR THIRD! animations
-- **Perfect round bonus** — +50 berries for 8/8 correct
+- **Perfect round bonus** — +50 berries for all correct
+- **Word progress per world** — bar fills as you correctly answer each word; turns green when mastered
 - **Haptic feedback** (mobile) and Web Audio API sound effects (no audio files)
 - **Multi-profile** — up to 6 pirates per device, persistent via localStorage
-- **3 languages** — EN / ES / CA switchable at any time
+- **3 UI languages** — interface in EN / ES / CA
+- **Settings panel** — sound, UI language, and learning language grouped under a ⚙️ gear icon
 - **PWA** — installable, offline-capable
 
 ## Tech stack
@@ -48,9 +51,9 @@ src/
   components/     WordCard, TimerRing, OptionsGrid, ParticleEmitter…
   config/         Achievements, daily challenge config, ranks
   data/
-    worlds/       15 world files (30 words each for animals/food, 20 for others)
+    worlds/       15 world files (20–30 words each)
   engine/         QuestionEngine, seeded RNG
-  i18n/           EN / ES / CA translations
+  i18n/           EN / ES / CA UI translations
   screens/        StartScreen, HubScreen, GameScreen, ResultScreen…
   store/          gameStore, profileStore, settingsStore
   utils/          rankHelpers, achievementHelpers, haptics
@@ -72,14 +75,13 @@ src/
 | Nature 🌿 | 23,000 | 20 |
 | Fruits 🍓 | 30,000 | 20 |
 | Vegetables 🥦 | 38,000 | 20 |
-| Sports ⚽ | 47,000 | 20 |
-| Emotions 😊 | 57,000 | 20 |
-| Actions 🏃 | 68,000 | 20 |
+| Sports ⚽ | 48,000 | 20 |
+| Emotions 😊 | 60,000 | 20 |
+| Actions 🏃 | 75,000 | 20 |
 
 ## Score formula
 
 ```
-base = 10 pts
 streak < 3  → 10 pts
 streak < 5  → 15 pts  (×1.5)
 streak < 10 → 20 pts  (×2)
