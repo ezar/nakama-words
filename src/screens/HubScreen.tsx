@@ -131,6 +131,9 @@ export function HubScreen() {
               >
                 ✓ {t.back}
               </button>
+              <div className="mt-4 text-center font-body text-[10px] text-white/20 tracking-widest">
+                v{__BUILD_VERSION__}
+              </div>
             </motion.div>
           </>
         )}
