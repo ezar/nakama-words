@@ -148,6 +148,9 @@ export function HubScreen() {
           ← {t.back}
         </button>
         <div className="flex items-center gap-3">
+          <button onClick={() => setPhase('progress')} className="font-body text-xs text-op-gold/60 hover:text-op-gold">
+            {t.progress}
+          </button>
           <button onClick={() => setPhase('achievements')} className="font-body text-xs text-op-gold/60 hover:text-op-gold">
             {t.achievements}
           </button>
