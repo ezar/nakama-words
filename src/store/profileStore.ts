@@ -17,6 +17,7 @@ export interface Profile {
   achievements: string[]
   createdAt: number
   wordProgress: Partial<Record<TargetLang, Partial<Record<WorldId, string[]>>>>
+  wordStats: Partial<Record<TargetLang, Record<string, { c: number; w: number }>>>
 }
 
 interface ProfileState {
@@ -35,6 +36,7 @@ interface ProfileState {
   completeDaily: (dateStr: string) => void
   grantAchievements: (ids: string[]) => void
   markWordsLearned: (worldId: WorldId, lang: TargetLang, wordKeys: string[]) => void
+  recordWordStats: (lang: TargetLang, correct: string[], wrong: string[]) => void
 }
 
 function createEmptyProfile(name: string): Profile {
@@ -50,6 +52,7 @@ function createEmptyProfile(name: string): Profile {
     achievements: [],
     createdAt: Date.now(),
     wordProgress: {},
+    wordStats: {},
   }
 }
 
@@ -169,6 +172,24 @@ export const useProfileStore = create<ProfileState>()(
             const existing = langProgress[worldId] ?? []
             const merged = [...new Set([...existing, ...wordKeys])]
             return { ...p, wordProgress: { ...progress, [lang]: { ...langProgress, [worldId]: merged } } }
+          }),
+        })),
+
+      recordWordStats: (lang, correct, wrong) =>
+        set(s => ({
+          profiles: s.profiles.map(p => {
+            if (p.id !== s.activeProfileId) return p
+            const stats = { ...(p.wordStats ?? {}) }
+            const langStats = { ...(stats[lang] ?? {}) }
+            for (const key of correct) {
+              const prev = langStats[key] ?? { c: 0, w: 0 }
+              langStats[key] = { c: prev.c + 1, w: prev.w }
+            }
+            for (const key of wrong) {
+              const prev = langStats[key] ?? { c: 0, w: 0 }
+              langStats[key] = { c: prev.c, w: prev.w + 1 }
+            }
+            return { ...p, wordStats: { ...stats, [lang]: langStats } }
           }),
         })),
     }),

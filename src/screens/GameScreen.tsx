@@ -29,7 +29,7 @@ export function GameScreen() {
     answerQuestion, advanceQuestion, finishRound,
   } = useGameStore()
 
-  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned } = useProfileStore()
+  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned, recordWordStats } = useProfileStore()
   const { language } = useSettingsStore()
   const t = getTranslations(language)
 
@@ -58,6 +58,9 @@ export function GameScreen() {
         const { learnLang } = useSettingsStore.getState()
         markWordsLearned(currentWorldId, learnLang, correctWords.map(w => w.en))
       }
+      const { learnLang } = useSettingsStore.getState()
+      const { wrongWords } = useGameStore.getState()
+      recordWordStats(learnLang, correctWords.map(w => w.en), wrongWords.map(w => w.en))
       const berriesResult = addBerries(finalScore + perfectBonus)
       finishRound({ ...berriesResult, perfectBonus })
     } else {
