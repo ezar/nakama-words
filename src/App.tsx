@@ -6,6 +6,7 @@ import { GameScreen } from './screens/GameScreen'
 import { ResultScreen } from './screens/ResultScreen'
 import { RankingScreen } from './screens/RankingScreen'
 import { AchievementsScreen } from './screens/AchievementsScreen'
+import { WordStatsScreen } from './screens/WordStatsScreen'
 
 function Screen({ children }: { children: React.ReactNode }) {
   return (
@@ -37,6 +38,7 @@ export function App() {
         {phase === 'result'       && <Screen key="result"><ResultScreen /></Screen>}
         {phase === 'ranking'      && <Screen key="ranking"><RankingScreen /></Screen>}
         {phase === 'achievements' && <Screen key="achievements"><AchievementsScreen /></Screen>}
+        {phase === 'progress'     && <Screen key="progress"><WordStatsScreen /></Screen>}
       </AnimatePresence>
     </div>
   )

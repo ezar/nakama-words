@@ -8,7 +8,7 @@ import { calcQuestionScore } from '../utils/rankHelpers'
 import { getDailyWords, DAILY_BERRY_MULTIPLIER } from '../config/daily'
 import { todayString } from '../engine/rng'
 
-export type Phase = 'start' | 'hub' | 'game' | 'result' | 'ranking' | 'achievements'
+export type Phase = 'start' | 'hub' | 'game' | 'result' | 'ranking' | 'achievements' | 'progress'
 
 export interface RoundResult {
   score: number
