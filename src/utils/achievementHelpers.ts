@@ -27,6 +27,9 @@ const WORLD_ACHIEVEMENT: Record<WorldId, string> = {
   sports:     'sports_star',
   emotions:   'feel_it_all',
   actions:    'action_hero',
+  transport:  'transport_ace',
+  weather:    'weather_watcher',
+  professions: 'career_explorer',
 }
 
 export function checkNewAchievements(snapshot: ProfileSnapshot): string[] {

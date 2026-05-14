@@ -2,6 +2,7 @@ export type WorldId =
   | 'animals' | 'food' | 'colors' | 'family' | 'body'
   | 'numbers' | 'clothes' | 'house' | 'school' | 'nature'
   | 'fruits' | 'vegetables' | 'sports' | 'emotions' | 'actions'
+  | 'transport' | 'weather' | 'professions'
 
 export interface WordEntry {
   en: string
@@ -37,6 +38,9 @@ export { vegetablesWorld } from './worlds/vegetables'
 export { sportsWorld }     from './worlds/sports'
 export { emotionsWorld }   from './worlds/emotions'
 export { actionsWorld }    from './worlds/actions'
+export { transportWorld }  from './worlds/transport'
+export { weatherWorld }    from './worlds/weather'
+export { professionsWorld } from './worlds/professions'
 
 import { animalsWorld }    from './worlds/animals'
 import { foodWorld }       from './worlds/food'
@@ -53,6 +57,9 @@ import { vegetablesWorld } from './worlds/vegetables'
 import { sportsWorld }     from './worlds/sports'
 import { emotionsWorld }   from './worlds/emotions'
 import { actionsWorld }    from './worlds/actions'
+import { transportWorld }  from './worlds/transport'
+import { weatherWorld }    from './worlds/weather'
+import { professionsWorld } from './worlds/professions'
 
 export const WORLDS: World[] = [
   animalsWorld,
@@ -70,6 +77,9 @@ export const WORLDS: World[] = [
   sportsWorld,
   emotionsWorld,
   actionsWorld,
+  transportWorld,
+  weatherWorld,
+  professionsWorld,
 ]
 
 export const WORLD_MAP: Record<WorldId, World> = {
@@ -88,4 +98,7 @@ export const WORLD_MAP: Record<WorldId, World> = {
   sports:     sportsWorld,
   emotions:   emotionsWorld,
   actions:    actionsWorld,
+  transport:  transportWorld,
+  weather:    weatherWorld,
+  professions: professionsWorld,
 }
