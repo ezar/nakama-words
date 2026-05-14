@@ -92,7 +92,7 @@ export const bodyWorld: World = {
     { en: 'NAVEL',          es: 'OMBLIGO',          ca: 'MELIC',             hint: 'Small dip in the middle of the belly',   icon: '🔘'  },
     { en: 'VEIN',           es: 'VENA',             ca: 'VENA',              hint: 'Carries blood back to the heart',        icon: '🩸'  },
     { en: 'ARTERY',         es: 'ARTERIA',          ca: 'ARTÈRIA',           hint: 'Carries blood away from the heart',      icon: '🔴'  },
-    { en: 'BELLY BUTTON',  es: 'OMBLIGO',          ca: 'LLOMBRÍGOL',        hint: 'Round hole in the middle of the tummy',  icon: '🔵'  },
+    { en: 'BELLY BUTTON',  es: 'OMBLIGO',          ca: 'LLOMBRÍGOL',        hint: 'Round hole in the middle of the tummy',  icon: '🌑'  },
     { en: 'CHEST HAIR',    es: 'VELLO DEL PECHO',  ca: 'PÈL DEL PIT',       hint: 'Curly hair that grows on the chest',     icon: '〰️'  },
     { en: 'MUSCLE',        es: 'MÚSCULO',          ca: 'MÚSCUL',            hint: 'Body tissue that helps you move',        icon: '🥊'  },
     { en: 'BONE',          es: 'HUESO',            ca: 'OS',                hint: 'Hard white part inside your body',       icon: '☠️'  },
