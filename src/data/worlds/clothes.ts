@@ -100,5 +100,6 @@ export const clothesWorld: World = {
     { en: 'RING',        es: 'ANILLO',     ca: 'ANELL',        hint: 'Circle of metal worn on a finger',   icon: '⭕' },
     { en: 'WATCH',       es: 'RELOJ',      ca: 'RELLOTGE',     hint: 'Tells you the time on your wrist',   icon: '⌚' },
     { en: 'SUNGLASSES',  es: 'GAFAS DE SOL', ca: 'ULLERES DE SOL', hint: 'Dark glasses to protect from sunlight', icon: '🕶️' },
+    { en: 'KNIT',        es: 'PUNTO',      ca: 'PUNT',         hint: 'Fabric made by looping yarn together', icon: '🧷' },
   ],
 }
