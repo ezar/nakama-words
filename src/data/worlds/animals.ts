@@ -79,7 +79,7 @@ export const animalsWorld: World = {
     { en: 'LOBSTER',     es: 'LANGOSTA',   ca: 'LLAGOSTA',     hint: 'Red sea creature with big claws',   icon: '🦞' },
     { en: 'SHRIMP',      es: 'CAMARÓN',    ca: 'GAMBA',        hint: 'Tiny pink swimmer in the ocean',    icon: '🦐' },
     { en: 'STARFISH',    es: 'ESTRELLA DE MAR', ca: 'ESTRELLA DE MAR', hint: 'Star-shaped sea creature on the beach', icon: '⭐' },
-    { en: 'SEAHORSE',    es: 'CABALLITO DE MAR', ca: 'CAVALLET DE MAR', hint: 'Tiny horse that swims upright', icon: '🌊' },
+    { en: 'SEAHORSE',    es: 'CABALLITO DE MAR', ca: 'CAVALLET DE MAR', hint: 'Tiny horse that swims upright', icon: '🐚' },
     { en: 'CLOWNFISH',   es: 'PEZ PAYASO', ca: 'PEZ PALLASSO', hint: 'Orange fish that hides in anemones', icon: '🐠' },
     { en: 'SQUID',       es: 'CALAMAR',    ca: 'CALAMAR',      hint: 'Ten arms and squirts black ink',    icon: '🦑' },
     { en: 'LIZARD',      es: 'LAGARTO',    ca: 'LLANGARDAIX',  hint: 'Small reptile that basks in the sun', icon: '🦎' },
@@ -102,6 +102,6 @@ export const animalsWorld: World = {
     { en: 'OTTER',       es: 'NUTRIA',     ca: 'LLÚDRIGA',     hint: 'Swims on its back holding hands',   icon: '🦦' },
     { en: 'SKUNK',       es: 'MOFETA',     ca: 'MOFETA',       hint: 'Black and white, sprays bad smell', icon: '🦨' },
     { en: 'MEERKAT',     es: 'SURICATA',   ca: 'SURICATA',     hint: 'Stands tall on its feet watching',  icon: '🦡' },
-    { en: 'ALLIGATOR',   es: 'CAIMÁN',     ca: 'CAIMAN',       hint: 'Swamp reptile, cousin of the croc', icon: '🐊' },
+    { en: 'GRASSHOPPER', es: 'SALTAMONTES', ca: 'LLAGOST',      hint: 'Green insect that leaps really high', icon: '🦗' },
   ],
 }
