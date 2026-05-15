@@ -146,7 +146,7 @@ export function WordStatsScreen() {
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`flex-1 py-2 rounded-xl border-2 font-title text-sm transition-colors ${
+            className={`flex-1 py-2 rounded-xl border-2 font-title text-sm uppercase tracking-widest transition-colors ${
               tab === key
                 ? 'border-op-gold bg-op-gold/20 text-op-gold'
                 : 'border-white/15 text-white/40 hover:text-white/60'
