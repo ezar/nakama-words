@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '../store/gameStore'
 import { useProfileStore } from '../store/profileStore'
@@ -9,6 +9,22 @@ import { todayString } from '../engine/rng'
 
 type Tab    = 'calendar' | 'words'
 type Filter = 'all' | 'struggling' | 'learning' | 'mastered'
+
+const LANG_VOICE: Record<string, string> = { es: 'es-ES', ca: 'ca-ES', en: 'en-US' }
+
+function speak(en: string, translation: string, learnLang: string) {
+  if (!window.speechSynthesis) return
+  window.speechSynthesis.cancel()
+  const targetLang = LANG_VOICE[learnLang] ?? 'es-ES'
+  const u1 = new SpeechSynthesisUtterance(en)
+  u1.lang = 'en-US'
+  u1.rate = 0.9
+  const u2 = new SpeechSynthesisUtterance(translation)
+  u2.lang = targetLang
+  u2.rate = 0.9
+  window.speechSynthesis.speak(u1)
+  window.speechSynthesis.speak(u2)
+}
 
 function accuracy(c: number, w: number) {
   const total = c + w
@@ -54,6 +70,14 @@ export function WordStatsScreen() {
 
   const [tab, setTab] = useState<Tab>('calendar')
   const [filter, setFilter] = useState<Filter>('all')
+  const [speaking, setSpeaking] = useState<string | null>(null)
+
+  const handleSpeak = useCallback((en: string, translation: string) => {
+    setSpeaking(en)
+    speak(en, translation, learnLang)
+    const total = (en.length + translation.length) * 70 + 800
+    setTimeout(() => setSpeaking(null), total)
+  }, [learnLang])
 
   const profile = getActiveProfile()
   if (!profile) { setPhase('hub'); return null }
@@ -304,6 +328,16 @@ export function WordStatsScreen() {
                             ✓{row.c} ✗{row.w} · {row.total} {t.attempts} · {row.world}
                           </div>
                         </div>
+                        <button
+                          onClick={() => handleSpeak(row.en, row.translation)}
+                          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                            speaking === row.en
+                              ? 'bg-op-cyan/30 text-op-cyan'
+                              : 'bg-white/8 text-white/40 hover:bg-white/15 hover:text-white/70'
+                          }`}
+                        >
+                          {speaking === row.en ? '🔊' : '🔈'}
+                        </button>
                       </motion.div>
                     )
                   })}
