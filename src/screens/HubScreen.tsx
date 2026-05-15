@@ -215,39 +215,6 @@ export function HubScreen() {
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
 
-      {/* ── Activity calendar (last 14 days) ── */}
-      {(() => {
-        const played = new Set(profile.playedDates ?? [])
-        const days = Array.from({ length: 14 }, (_, i) => {
-          const d = new Date()
-          d.setDate(d.getDate() - (13 - i))
-          return d.toISOString().slice(0, 10).replace(/-/g, '')
-        })
-        const hasAny = days.some(d => played.has(d))
-        if (!hasAny) return null
-        return (
-          <div className="mx-4 mb-3 flex-shrink-0">
-            <div className="font-body text-[10px] text-white/30 tracking-widest mb-1.5">{t.activity.toUpperCase()}</div>
-            <div className="flex gap-1.5">
-              {days.map(d => {
-                const isToday = d === today
-                const done = played.has(d)
-                return (
-                  <div
-                    key={d}
-                    className={`flex-1 h-4 rounded-sm transition-all ${
-                      done
-                        ? isToday ? 'bg-op-cyan' : 'bg-op-green/70'
-                        : isToday ? 'bg-white/20 ring-1 ring-op-cyan/40' : 'bg-white/8'
-                    }`}
-                  />
-                )
-              })}
-            </div>
-          </div>
-        )
-      })()}
-
       {/* ── Game mode selector ── */}
       <div className="mx-4 mb-3 flex-shrink-0 flex gap-2">
         {([['normal', t.normalMode], ['survival', t.survivalMode], ['reverse', t.reverseMode]] as [GameMode, string][]).map(([mode, label]) => (
