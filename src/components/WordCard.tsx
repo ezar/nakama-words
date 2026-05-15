@@ -1,13 +1,17 @@
 import { motion } from 'framer-motion'
-import type { WordEntry } from '../data/words'
+import type { WordEntry, TargetLang } from '../data/words'
 
 interface WordCardProps {
   entry: WordEntry
+  reversed?: boolean
+  learnLang?: TargetLang
   questionNumber?: number
   totalQuestions?: number
 }
 
-export function WordCard({ entry }: WordCardProps) {
+export function WordCard({ entry, reversed = false, learnLang = 'es' }: WordCardProps) {
+  const displayWord = reversed ? (entry[learnLang] ?? entry.es) : entry.en
+
   return (
     <motion.div
       key={entry.en}
@@ -18,8 +22,11 @@ export function WordCard({ entry }: WordCardProps) {
     >
       <div className="text-5xl mb-2">{entry.icon}</div>
       <div className="font-title text-4xl text-op-ink tracking-wider mb-2">
-        {entry.en}
+        {displayWord}
       </div>
+      {reversed && (
+        <div className="font-body text-xs text-op-ink/50 italic mb-1 tracking-widest">→ English?</div>
+      )}
       <div className="font-body text-sm text-op-ink/70 italic">
         {entry.hint}
       </div>

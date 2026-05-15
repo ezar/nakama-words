@@ -17,20 +17,20 @@ const QUESTION_DURATION = 10
 const PERFECT_BONUS = 50
 
 const STREAK_MILESTONES: Record<number, { label: string; color: string }> = {
-  3:  { label: '🔥 ON FIRE!',           color: 'text-orange-400' },
-  5:  { label: '⚡ GEAR SECOND!',        color: 'text-op-cyan' },
+  3:  { label: '🔥 ON FIRE!',               color: 'text-orange-400' },
+  5:  { label: '⚡ GEAR SECOND!',            color: 'text-op-cyan' },
   10: { label: '👑 GEAR THIRD — LEGENDARY!', color: 'text-op-gold' },
 }
 
 export function GameScreen() {
   const {
     currentQuestion, currentQuestionIndex, wordQueue,
-    score, streak, isDaily, currentWorldId,
-    answerQuestion, advanceQuestion, finishRound,
+    score, streak, isDaily, currentWorldId, gameMode, lives,
+    answerQuestion, loseLife, advanceQuestion, finishRound,
   } = useGameStore()
 
-  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned, recordWordStats } = useProfileStore()
-  const { language } = useSettingsStore()
+  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned, recordWordStats, recordPlayedDate } = useProfileStore()
+  const { language, learnLang } = useSettingsStore()
   const t = getTranslations(language)
 
   const [selected, setSelected] = useState<string | null>(null)
@@ -40,29 +40,31 @@ export function GameScreen() {
   const [particleTrigger, setParticleTrigger] = useState(false)
   const [milestoneBanner, setMilestoneBanner] = useState<string | null>(null)
   const [milestoneColor, setMilestoneColor] = useState('text-op-gold')
+  const [survivorDead, setSurvivorDead] = useState(false)
 
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shownMilestones = useRef(new Set<number>())
 
   const totalQuestions = wordQueue.length
-  const isLastQuestion = currentQuestionIndex >= totalQuestions - 1
+  const isLastQuestion = currentQuestionIndex >= totalQuestions - 1 || survivorDead
 
   const doAdvance = useCallback(() => {
     if (isLastQuestion) {
       const { maxStreak, correctWords, wordQueue: finalQueue, score: finalScore } = useGameStore.getState()
-      const perfectBonus = correctWords.length === finalQueue.length ? PERFECT_BONUS : 0
+      const perfectBonus = !survivorDead && correctWords.length === finalQueue.length ? PERFECT_BONUS : 0
       updateMaxStreak(maxStreak)
       addCorrect(correctWords.length)
       if (isDaily) completeDaily(todayString())
       if (!isDaily && currentWorldId) {
-        const { learnLang } = useSettingsStore.getState()
-        markWordsLearned(currentWorldId, learnLang, correctWords.map(w => w.en))
+        const { learnLang: ll } = useSettingsStore.getState()
+        markWordsLearned(currentWorldId, ll, correctWords.map(w => w.en))
       }
-      const { learnLang } = useSettingsStore.getState()
+      const { learnLang: ll } = useSettingsStore.getState()
       const { wrongWords } = useGameStore.getState()
-      recordWordStats(learnLang, correctWords.map(w => w.en), wrongWords.map(w => w.en))
+      recordWordStats(ll, correctWords.map(w => w.en), wrongWords.map(w => w.en))
+      recordPlayedDate(todayString())
       const berriesResult = addBerries(finalScore + perfectBonus)
-      finishRound({ ...berriesResult, perfectBonus })
+      finishRound({ ...berriesResult, perfectBonus, gameOver: survivorDead })
     } else {
       advanceQuestion()
       setSelected(null)
@@ -70,7 +72,7 @@ export function GameScreen() {
       setTimerKey(k => k + 1)
       setTimerRunning(true)
     }
-  }, [isLastQuestion, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, isDaily, completeDaily])
+  }, [isLastQuestion, survivorDead, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, isDaily, completeDaily, currentWorldId, markWordsLearned, recordWordStats, recordPlayedDate])
 
   const handleSelect = useCallback((option: string) => {
     if (selected !== null) return
@@ -100,10 +102,14 @@ export function GameScreen() {
     } else {
       soundEngine.playWrong()
       vibrate(HapticPattern.wrong)
+      if (gameMode === 'survival') {
+        const dead = loseLife()
+        if (dead) setSurvivorDead(true)
+      }
     }
 
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
-  }, [selected, answerQuestion, doAdvance])
+  }, [selected, answerQuestion, loseLife, gameMode, doAdvance])
 
   const handleTimeout = useCallback(() => {
     if (selected !== null) return
@@ -113,8 +119,12 @@ export function GameScreen() {
     answerQuestion('')
     soundEngine.playWrong()
     vibrate(HapticPattern.wrong)
+    if (gameMode === 'survival') {
+      const dead = loseLife()
+      if (dead) setSurvivorDead(true)
+    }
     advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
-  }, [selected, answerQuestion, doAdvance])
+  }, [selected, answerQuestion, loseLife, gameMode, doAdvance])
 
   // Keyboard 1–4
   useEffect(() => {
@@ -140,6 +150,8 @@ export function GameScreen() {
   if (!currentQuestion) return null
 
   const answeredCount = currentQuestionIndex + (selected !== null ? 1 : 0)
+  const isSurvival = gameMode === 'survival'
+  const isReverse = gameMode === 'reverse'
 
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark px-4 pt-5 pb-6">
@@ -162,7 +174,7 @@ export function GameScreen() {
         )}
       </AnimatePresence>
 
-      {/* ── TOP BAR: streak + score ── */}
+      {/* ── TOP BAR: streak · lives · score ── */}
       <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <AnimatePresence mode="wait">
           <motion.span
@@ -176,6 +188,21 @@ export function GameScreen() {
             {streak > 0 ? `🔥 ×${streak}` : '🎯 Ready!'}
           </motion.span>
         </AnimatePresence>
+
+        {isSurvival && (
+          <div className="flex gap-1">
+            {[0, 1, 2].map(i => (
+              <motion.span
+                key={i}
+                animate={i === lives ? { scale: [1, 1.3, 0.8] } : {}}
+                className={`text-xl ${i < lives ? 'opacity-100' : 'opacity-20 grayscale'}`}
+              >
+                ❤️
+              </motion.span>
+            ))}
+          </div>
+        )}
+
         <motion.div
           key={score}
           initial={{ scale: 1.35 }}
@@ -214,12 +241,13 @@ export function GameScreen() {
           <WordCard
             key={currentQuestionIndex}
             entry={currentQuestion.prompt}
+            reversed={isReverse}
+            learnLang={learnLang}
             questionNumber={currentQuestionIndex + 1}
             totalQuestions={totalQuestions}
           />
         </AnimatePresence>
 
-        {/* Timer + feedback stacked & centered */}
         <div className="flex flex-col items-center gap-2">
           <TimerRing
             key={timerKey}
@@ -228,7 +256,6 @@ export function GameScreen() {
             running={timerRunning}
           />
 
-          {/* Fixed-height feedback area — never shifts layout */}
           <div className="h-14 flex flex-col items-center justify-center gap-1">
             <AnimatePresence>
               {feedbackCorrect !== null && (
@@ -249,7 +276,6 @@ export function GameScreen() {
               )}
             </AnimatePresence>
 
-            {/* Correct answer revealed after a wrong/timeout */}
             <AnimatePresence>
               {feedbackCorrect === false && (
                 <motion.div
@@ -276,7 +302,10 @@ export function GameScreen() {
           disabled={selected !== null}
         />
         <div className="text-center font-body text-xs text-white/20 tracking-widest">
-          {currentWorldId?.toUpperCase()}{isDaily ? ' · DAILY ×3' : ''}
+          {currentWorldId?.toUpperCase()}
+          {isDaily ? ' · DAILY ×3' : ''}
+          {isSurvival ? ' · ❤️ SURVIVAL' : ''}
+          {isReverse ? ' · 🔄 REVERSE' : ''}
         </div>
       </div>
     </div>

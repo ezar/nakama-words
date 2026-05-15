@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '../store/gameStore'
+import { useProfileStore } from '../store/profileStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { StarRating } from '../components/StarRating'
 import { getTranslations } from '../i18n/translations'
@@ -10,6 +11,7 @@ import { WORLD_MAP } from '../data/words'
 
 export function ResultScreen() {
   const { lastResult, setPhase, currentWorldId, resetRound, newAchievements, rankedUp, newRankLabel } = useGameStore()
+  const { getActiveProfile } = useProfileStore()
   const { language, learnLang } = useSettingsStore()
   const t = getTranslations(language)
 
@@ -19,7 +21,18 @@ export function ResultScreen() {
 
   if (!lastResult) return null
 
-  const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions, perfectBonus, newlyUnlockedWorlds } = lastResult
+  const { score, berriesEarned, maxStreak, correctWords, wrongWords, totalQuestions, perfectBonus, newlyUnlockedWorlds, gameOver } = lastResult
+
+  const handleShare = async () => {
+    const profile = getActiveProfile()
+    const name = profile?.name ?? 'Pirate'
+    const text = `🏴‍☠️ ${name} — Palabra Hunter\n⭐ ${correctWords.length}/${totalQuestions} correct\n🍇 ${berriesEarned} berries earned\n🔥 Best streak: ${maxStreak}${gameOver ? '\n💀 SURVIVAL: fought until the end!' : ''}`
+    if (navigator.share) {
+      await navigator.share({ title: 'Palabra Hunter', text }).catch(() => null)
+    } else {
+      await navigator.clipboard.writeText(text).catch(() => null)
+    }
+  }
 
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark">
@@ -75,10 +88,10 @@ export function ResultScreen() {
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             <div className="text-6xl mb-3">
-              {perfectBonus > 0 ? '🌟' : '🏴‍☠️'}
+              {gameOver ? '💀' : perfectBonus > 0 ? '🌟' : '🏴‍☠️'}
             </div>
-            <h1 className="font-title text-4xl text-op-gold tracking-widest">
-              {perfectBonus > 0 ? t.perfectRound : t.roundComplete}
+            <h1 className={`font-title text-4xl tracking-widest ${gameOver ? 'text-op-red' : 'text-op-gold'}`}>
+              {gameOver ? t.gameOver : perfectBonus > 0 ? t.perfectRound : t.roundComplete}
             </h1>
           </motion.div>
           <motion.div
@@ -263,21 +276,30 @@ export function ResultScreen() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.45 }}
-        className="flex-shrink-0 flex gap-3 px-4 pb-4 pt-2 border-t border-white/5"
+        className="flex-shrink-0 flex flex-col gap-2 px-4 pb-4 pt-2 border-t border-white/5"
       >
+        <div className="flex gap-3">
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => { resetRound(); setPhase('hub') }}
+            className="flex-1 py-4 rounded-2xl border-4 border-white/20 text-white/60 font-title text-xl hover:border-op-cyan hover:text-op-cyan transition-colors"
+          >
+            🏴‍☠️ HUB
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => { resetRound(); if (currentWorldId) useGameStore.getState().startRound(currentWorldId) }}
+            className="flex-[2] py-4 rounded-2xl border-4 border-op-ink bg-op-gold text-op-ink font-title text-2xl shadow-manga hover:brightness-105 transition-all"
+          >
+            {t.playAgain}
+          </motion.button>
+        </div>
         <motion.button
           whileTap={{ scale: 0.96 }}
-          onClick={() => { resetRound(); setPhase('hub') }}
-          className="flex-1 py-4 rounded-2xl border-4 border-white/20 text-white/60 font-title text-xl hover:border-op-cyan hover:text-op-cyan transition-colors"
+          onClick={handleShare}
+          className="w-full py-2.5 rounded-2xl border-2 border-white/15 text-white/40 font-body text-sm hover:text-white/70 transition-colors flex items-center justify-center gap-2"
         >
-          🏴‍☠️ HUB
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          onClick={() => { resetRound(); if (currentWorldId) useGameStore.getState().startRound(currentWorldId) }}
-          className="flex-[2] py-4 rounded-2xl border-4 border-op-ink bg-op-gold text-op-ink font-title text-2xl shadow-manga hover:brightness-105 transition-all"
-        >
-          {t.playAgain}
+          📤 {t.shareResult}
         </motion.button>
       </motion.div>
     </div>

@@ -29,7 +29,13 @@ const WORLD_ACHIEVEMENT: Record<WorldId, string> = {
   actions:    'action_hero',
   transport:  'transport_ace',
   weather:    'weather_watcher',
-  professions: 'career_explorer',
+  professions:  'career_explorer',
+  instruments:  'music_maestro',
+  countries:    'world_explorer',
+  planets:      'space_cadet',
+  shapes:       'geometry_genius',
+  tools:        'master_builder',
+  time:         'time_keeper',
 }
 
 export function checkNewAchievements(snapshot: ProfileSnapshot): string[] {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useProfileStore } from '../store/profileStore'
-import { useGameStore } from '../store/gameStore'
+import { useGameStore, type GameMode } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { WORLDS, type WorldId } from '../data/words'
 import { getRankForBerries, getNextRank, getRankProgress } from '../utils/rankHelpers'
@@ -12,7 +12,7 @@ const LANGS: Lang[] = ['en', 'es', 'ca']
 
 export function HubScreen() {
   const { getActiveProfile } = useProfileStore()
-  const { setPhase, startRound } = useGameStore()
+  const { setPhase, startRound, gameMode, setGameMode } = useGameStore()
   const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang } = useSettingsStore()
   const t = getTranslations(language)
 
@@ -214,6 +214,56 @@ export function HubScreen() {
       >
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
+
+      {/* ── Activity calendar (last 14 days) ── */}
+      {(() => {
+        const played = new Set(profile.playedDates ?? [])
+        const days = Array.from({ length: 14 }, (_, i) => {
+          const d = new Date()
+          d.setDate(d.getDate() - (13 - i))
+          return d.toISOString().slice(0, 10).replace(/-/g, '')
+        })
+        const hasAny = days.some(d => played.has(d))
+        if (!hasAny) return null
+        return (
+          <div className="mx-4 mb-3 flex-shrink-0">
+            <div className="font-body text-[10px] text-white/30 tracking-widest mb-1.5">{t.activity.toUpperCase()}</div>
+            <div className="flex gap-1.5">
+              {days.map(d => {
+                const isToday = d === today
+                const done = played.has(d)
+                return (
+                  <div
+                    key={d}
+                    className={`flex-1 h-4 rounded-sm transition-all ${
+                      done
+                        ? isToday ? 'bg-op-cyan' : 'bg-op-green/70'
+                        : isToday ? 'bg-white/20 ring-1 ring-op-cyan/40' : 'bg-white/8'
+                    }`}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* ── Game mode selector ── */}
+      <div className="mx-4 mb-3 flex-shrink-0 flex gap-2">
+        {([['normal', t.normalMode], ['survival', t.survivalMode], ['reverse', t.reverseMode]] as [GameMode, string][]).map(([mode, label]) => (
+          <button
+            key={mode}
+            onClick={() => setGameMode(mode)}
+            className={`flex-1 py-1.5 rounded-xl border-2 font-body text-xs transition-colors ${
+              gameMode === mode
+                ? 'border-op-gold bg-op-gold/20 text-op-gold'
+                : 'border-white/15 text-white/35 hover:text-white/60'
+            }`}
+          >
+            {mode === 'normal' ? '🎯' : mode === 'survival' ? '❤️' : '🔄'} {label}
+          </button>
+        ))}
+      </div>
 
       {/* ── World list ── */}
       <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>

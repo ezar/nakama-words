@@ -18,6 +18,7 @@ export interface Profile {
   createdAt: number
   wordProgress: Partial<Record<TargetLang, Partial<Record<WorldId, string[]>>>>
   wordStats: Partial<Record<TargetLang, Record<string, { c: number; w: number }>>>
+  playedDates: string[]
 }
 
 interface ProfileState {
@@ -37,6 +38,7 @@ interface ProfileState {
   grantAchievements: (ids: string[]) => void
   markWordsLearned: (worldId: WorldId, lang: TargetLang, wordKeys: string[]) => void
   recordWordStats: (lang: TargetLang, correct: string[], wrong: string[]) => void
+  recordPlayedDate: (date: string) => void
 }
 
 function createEmptyProfile(name: string): Profile {
@@ -53,6 +55,7 @@ function createEmptyProfile(name: string): Profile {
     createdAt: Date.now(),
     wordProgress: {},
     wordStats: {},
+    playedDates: [],
   }
 }
 
@@ -191,6 +194,15 @@ export const useProfileStore = create<ProfileState>()(
             }
             return { ...p, wordStats: { ...stats, [lang]: langStats } }
           }),
+        })),
+
+      recordPlayedDate: (date) =>
+        set(s => ({
+          profiles: s.profiles.map(p =>
+            p.id === s.activeProfileId && !(p.playedDates ?? []).includes(date)
+              ? { ...p, playedDates: [...(p.playedDates ?? []), date] }
+              : p
+          ),
         })),
     }),
     { name: 'ph-profiles' },

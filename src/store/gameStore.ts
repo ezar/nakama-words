@@ -4,11 +4,13 @@ import type { Question } from '../engine/QuestionEngine'
 import { generateQuestion, buildRound, findWorldForEntry } from '../engine/QuestionEngine'
 import { WORLD_MAP } from '../data/words'
 import { useSettingsStore } from './settingsStore'
+import { useProfileStore } from './profileStore'
 import { calcQuestionScore } from '../utils/rankHelpers'
 import { getDailyWords, DAILY_BERRY_MULTIPLIER } from '../config/daily'
 import { todayString } from '../engine/rng'
 
 export type Phase = 'start' | 'hub' | 'game' | 'result' | 'ranking' | 'achievements' | 'progress'
+export type GameMode = 'normal' | 'survival' | 'reverse'
 
 export interface RoundResult {
   score: number
@@ -19,10 +21,12 @@ export interface RoundResult {
   totalQuestions: number
   perfectBonus: number
   newlyUnlockedWorlds: WorldId[]
+  gameOver: boolean
 }
 
 interface GameState {
   phase: Phase
+  gameMode: GameMode
   currentWorldId: WorldId | null
   wordQueue: WordEntry[]
   currentQuestionIndex: number
@@ -30,6 +34,7 @@ interface GameState {
   score: number
   streak: number
   maxStreak: number
+  lives: number
   isDaily: boolean
   correctWords: WordEntry[]
   wrongWords: WordEntry[]
@@ -39,17 +44,19 @@ interface GameState {
   newRankLabel: string
 
   setPhase: (phase: Phase) => void
+  setGameMode: (mode: GameMode) => void
   startRound: (worldId: WorldId, isDaily?: boolean) => void
-  loadQuestion: () => void
   answerQuestion: (answer: string) => boolean
+  loseLife: () => boolean
   advanceQuestion: () => void
-  finishRound: (berriesResult: { newAchievements: string[]; rankedUp: boolean; newRankLabel: string; newlyUnlockedWorlds: WorldId[]; perfectBonus: number }) => void
+  finishRound: (opts: { newAchievements: string[]; rankedUp: boolean; newRankLabel: string; newlyUnlockedWorlds: WorldId[]; perfectBonus: number; gameOver?: boolean }) => void
   resetRound: () => void
   setNewAchievements: (ids: string[]) => void
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
   phase: 'start',
+  gameMode: 'normal',
   currentWorldId: null,
   wordQueue: [],
   currentQuestionIndex: 0,
@@ -57,6 +64,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   score: 0,
   streak: 0,
   maxStreak: 0,
+  lives: 3,
   isDaily: false,
   correctWords: [],
   wrongWords: [],
@@ -66,21 +74,26 @@ export const useGameStore = create<GameState>()((set, get) => ({
   newRankLabel: '',
 
   setPhase: (phase) => set({ phase }),
+  setGameMode: (gameMode) => set({ gameMode }),
 
   startRound: (worldId, isDaily = false) => {
+    const { gameMode } = get()
     const world = WORLD_MAP[worldId]
-    let words: WordEntry[]
+    const learnLang = useSettingsStore.getState().learnLang
+    const reversed = gameMode === 'reverse'
 
+    let words: WordEntry[]
     if (isDaily) {
       words = getDailyWords(todayString())
     } else {
-      words = buildRound(world)
+      const profile = useProfileStore.getState().getActiveProfile()
+      const wordStats = profile?.wordStats?.[learnLang]
+      words = buildRound(world, Math.random, wordStats ?? undefined)
     }
 
     const firstEntry = words[0]!
     const firstWorld = isDaily ? findWorldForEntry(firstEntry) : world
-    const learnLang = useSettingsStore.getState().learnLang
-    const firstQuestion = generateQuestion(firstWorld, firstEntry, Math.random, learnLang)
+    const firstQuestion = generateQuestion(firstWorld, firstEntry, Math.random, learnLang, reversed)
 
     set({
       phase: 'game',
@@ -91,21 +104,11 @@ export const useGameStore = create<GameState>()((set, get) => ({
       score: 0,
       streak: 0,
       maxStreak: 0,
+      lives: 3,
       isDaily,
       correctWords: [],
       wrongWords: [],
     })
-  },
-
-  loadQuestion: () => {
-    const { wordQueue, currentQuestionIndex, currentWorldId } = get()
-    if (!currentWorldId) return
-    const world = WORLD_MAP[currentWorldId]
-    const entry = wordQueue[currentQuestionIndex]
-    if (!entry) return
-    const learnLang = useSettingsStore.getState().learnLang
-    const question = generateQuestion(world, entry, Math.random, learnLang)
-    set({ currentQuestion: question })
   },
 
   answerQuestion: (answer) => {
@@ -120,40 +123,38 @@ export const useGameStore = create<GameState>()((set, get) => ({
       score: s.score + points,
       streak: newStreak,
       maxStreak: Math.max(maxStreak, newStreak),
-      correctWords: correct
-        ? [...s.correctWords, currentQuestion.prompt]
-        : s.correctWords,
-      wrongWords: !correct
-        ? [...s.wrongWords, currentQuestion.prompt]
-        : s.wrongWords,
+      correctWords: correct ? [...s.correctWords, currentQuestion.prompt] : s.correctWords,
+      wrongWords: !correct ? [...s.wrongWords, currentQuestion.prompt] : s.wrongWords,
     }))
 
     return correct
   },
 
-  advanceQuestion: () => {
-    const { currentQuestionIndex, wordQueue, currentWorldId, isDaily } = get()
-    const nextIndex = currentQuestionIndex + 1
+  loseLife: () => {
+    const { lives } = get()
+    const newLives = lives - 1
+    set({ lives: newLives })
+    return newLives <= 0
+  },
 
-    if (nextIndex >= wordQueue.length || !currentWorldId) {
-      return
-    }
+  advanceQuestion: () => {
+    const { currentQuestionIndex, wordQueue, currentWorldId, isDaily, gameMode } = get()
+    const nextIndex = currentQuestionIndex + 1
+    if (nextIndex >= wordQueue.length || !currentWorldId) return
 
     const nextEntry = wordQueue[nextIndex]!
     const world = isDaily ? findWorldForEntry(nextEntry) : WORLD_MAP[currentWorldId]
     const learnLang = useSettingsStore.getState().learnLang
-    const nextQuestion = generateQuestion(world, nextEntry, Math.random, learnLang)
+    const reversed = gameMode === 'reverse'
+    const nextQuestion = generateQuestion(world, nextEntry, Math.random, learnLang, reversed)
 
-    set({
-      currentQuestionIndex: nextIndex,
-      currentQuestion: nextQuestion,
-    })
+    set({ currentQuestionIndex: nextIndex, currentQuestion: nextQuestion })
   },
 
-  finishRound: (berriesResult) => {
+  finishRound: ({ newAchievements, rankedUp, newRankLabel, newlyUnlockedWorlds, perfectBonus, gameOver = false }) => {
     const { score, maxStreak, correctWords, wrongWords, wordQueue, isDaily } = get()
     const multiplier = isDaily ? DAILY_BERRY_MULTIPLIER : 1
-    const berriesEarned = (score + berriesResult.perfectBonus) * multiplier
+    const berriesEarned = (score + perfectBonus) * multiplier
 
     set({
       phase: 'result',
@@ -164,12 +165,13 @@ export const useGameStore = create<GameState>()((set, get) => ({
         correctWords,
         wrongWords,
         totalQuestions: wordQueue.length,
-        perfectBonus: berriesResult.perfectBonus,
-        newlyUnlockedWorlds: berriesResult.newlyUnlockedWorlds,
+        perfectBonus,
+        newlyUnlockedWorlds,
+        gameOver,
       },
-      newAchievements: berriesResult.newAchievements,
-      rankedUp: berriesResult.rankedUp,
-      newRankLabel: berriesResult.newRankLabel,
+      newAchievements,
+      rankedUp,
+      newRankLabel,
     })
   },
 
@@ -182,6 +184,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
       score: 0,
       streak: 0,
       maxStreak: 0,
+      lives: 3,
       correctWords: [],
       wrongWords: [],
       lastResult: null,
