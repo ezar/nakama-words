@@ -315,7 +315,7 @@ export function HubScreen() {
       {/* ── World list ── */}
       <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {WORLDS.map((world, i) => {
             const locked = profile.berries < world.berriesRequired
             const learnedKeys = (profile.wordProgress ?? {})[learnLang]?.[world.id] ?? []

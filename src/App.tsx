@@ -28,8 +28,9 @@ export function App() {
   return (
     <div className="
       h-dvh overflow-hidden bg-op-ocean-dark relative
-      md:w-[500px] md:mx-auto
-      md:shadow-[4px_0_40px_rgba(0,0,0,0.7),-4px_0_40px_rgba(0,0,0,0.7)]
+      sm:w-[500px] sm:mx-auto
+      md:w-[700px]
+      sm:shadow-[4px_0_40px_rgba(0,0,0,0.7),-4px_0_40px_rgba(0,0,0,0.7)]
     ">
       <AnimatePresence mode="wait">
         {phase === 'start'        && <Screen key="start"><StartScreen /></Screen>}
