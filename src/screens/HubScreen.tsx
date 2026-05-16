@@ -122,7 +122,17 @@ export function HubScreen() {
                             : 'border-white/15 text-white/40 hover:text-white/70'
                         }`}
                       >
-                        {l === 'es' ? '🇪🇸 ES' : '🏴󠁥󠁳󠁣󠁴󠁿 CA'}
+                        {l === 'es' ? (
+                          <>🇪🇸 ES</>
+                        ) : (
+                          <span className="flex items-center gap-1.5">
+                            <span
+                              className="inline-block w-4 h-3 rounded-sm flex-shrink-0 border border-white/20"
+                              style={{ background: 'repeating-linear-gradient(to bottom,#FCDD09 0,#FCDD09 33%,#C1000B 33%,#C1000B 66%,#FCDD09 66%,#FCDD09 100%)' }}
+                            />
+                            CA
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
