@@ -46,6 +46,7 @@ export function RankingScreen() {
               <span className="text-2xl w-8 text-center">
                 {medals[i] ?? `#${i + 1}`}
               </span>
+              <span className="text-2xl">{profile.avatar ?? '🏴‍☠️'}</span>
               <div className="flex-1 min-w-0">
                 <div className="font-title text-xl text-op-gold truncate">{profile.name}</div>
                 <div className="font-body text-xs text-op-cyan">{rank.label}</div>

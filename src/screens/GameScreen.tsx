@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore } from '../store/gameStore'
 import { useProfileStore } from '../store/profileStore'
@@ -29,7 +29,15 @@ export function GameScreen() {
     answerQuestion, loseLife, advanceQuestion, finishRound,
   } = useGameStore()
 
-  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned, recordWordStats, recordPlayedDate } = useProfileStore()
+  const { addBerries, addCorrect, updateMaxStreak, completeDaily, markWordsLearned, recordWordStats, recordPlayedDate, updateBestRoundScore } = useProfileStore()
+
+  const ghostScore = useMemo(() => {
+    const s = useProfileStore.getState()
+    return s.profiles
+      .filter(p => p.id !== s.activeProfileId)
+      .reduce((max, p) => Math.max(max, p.bestRoundScore ?? 0), 0)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const { language, learnLang } = useSettingsStore()
   const t = getTranslations(language)
 
@@ -65,6 +73,7 @@ export function GameScreen() {
       const { wrongWords } = useGameStore.getState()
       recordWordStats(ll, correctWords.map(w => w.en), wrongWords.map(w => w.en))
       recordPlayedDate(todayString())
+      updateBestRoundScore(finalScore + perfectBonus)
       const berriesResult = addBerries(finalScore + perfectBonus)
       finishRound({ ...berriesResult, perfectBonus, gameOver: isGameOver })
     } else {
@@ -74,7 +83,7 @@ export function GameScreen() {
       setTimerKey(k => k + 1)
       setTimerRunning(true)
     }
-  }, [survivorDead, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, isDaily, completeDaily, currentWorldId, markWordsLearned, recordWordStats, recordPlayedDate])
+  }, [survivorDead, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, updateBestRoundScore, isDaily, completeDaily, currentWorldId, markWordsLearned, recordWordStats, recordPlayedDate])
 
   const handleSelect = useCallback((option: string) => {
     if (selected !== null) return
@@ -232,15 +241,20 @@ export function GameScreen() {
           </div>
         )}
 
-        <motion.div
-          key={score}
-          initial={{ scale: 1.35 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400 }}
-          className="font-title text-2xl text-op-gold"
-        >
-          🍇 {score}
-        </motion.div>
+        <div className="flex flex-col items-end">
+          <motion.div
+            key={score}
+            initial={{ scale: 1.35 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+            className="font-title text-2xl text-op-gold"
+          >
+            🍇 {score}
+          </motion.div>
+          {ghostScore > 0 && (
+            <div className="font-body text-[10px] text-white/25">👻 {ghostScore}</div>
+          )}
+        </div>
       </div>
 
       {/* ── PROGRESS DOTS / SURVIVAL COUNTER ── */}

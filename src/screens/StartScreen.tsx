@@ -1,4 +1,6 @@
 import { useState } from 'react'
+
+const PIRATE_AVATARS = ['🏴‍☠️', '☠️', '🦜', '⚓', '💎', '🧭', '🐚', '🐙']
 import { motion, AnimatePresence } from 'framer-motion'
 import { useProfileStore } from '../store/profileStore'
 import { useGameStore } from '../store/gameStore'
@@ -19,11 +21,13 @@ export function StartScreen() {
   )
   const [showCreate, setShowCreate] = useState(false)
   const [name, setName] = useState('')
+  const [selectedAvatar, setSelectedAvatar] = useState('🏴‍☠️')
 
   const handleCreate = () => {
     if (!name.trim()) return
-    createProfile(name.trim().toUpperCase())
+    createProfile(name.trim().toUpperCase(), selectedAvatar)
     setName('')
+    setSelectedAvatar('🏴‍☠️')
     setShowCreate(false)
   }
 
@@ -91,7 +95,7 @@ export function StartScreen() {
                   ✕
                 </button>
 
-                <div className="text-3xl">☠️</div>
+                <div className="text-3xl">{profile.avatar ?? '🏴‍☠️'}</div>
                 <div className="font-title text-lg text-op-gold leading-tight truncate w-full">
                   {profile.name}
                 </div>
@@ -195,6 +199,22 @@ export function StartScreen() {
                 autoFocus
                 className="w-full bg-white/5 border-2 border-op-gold/40 rounded-xl px-4 py-3 font-title text-2xl text-op-gold placeholder:text-op-gold/30 outline-none focus:border-op-gold mb-4"
               />
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {PIRATE_AVATARS.map(av => (
+                  <button
+                    key={av}
+                    type="button"
+                    onClick={() => setSelectedAvatar(av)}
+                    className={`text-3xl py-2 rounded-xl border-2 transition-colors ${
+                      av === selectedAvatar
+                        ? 'border-op-gold bg-op-gold/20'
+                        : 'border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    {av}
+                  </button>
+                ))}
+              </div>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowCreate(false)}

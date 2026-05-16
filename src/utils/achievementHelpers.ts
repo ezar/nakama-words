@@ -11,7 +11,7 @@ interface ProfileSnapshot {
   earnedAchievements: string[]
 }
 
-const WORLD_ACHIEVEMENT: Record<WorldId, string> = {
+const WORLD_ACHIEVEMENT: Partial<Record<WorldId, string>> = {
   animals:    'animal_expert',
   food:       'food_fanatic',
   colors:     'color_wizard',

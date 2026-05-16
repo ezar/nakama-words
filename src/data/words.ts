@@ -4,6 +4,7 @@ export type WorldId =
   | 'fruits' | 'vegetables' | 'sports' | 'emotions' | 'actions'
   | 'transport' | 'weather' | 'professions'
   | 'instruments' | 'countries' | 'planets' | 'shapes' | 'tools' | 'time'
+  | 'halloween' | 'christmas' | 'easter'
 
 export interface WordEntry {
   en: string
@@ -48,6 +49,9 @@ export { planetsWorld }     from './worlds/planets'
 export { shapesWorld }      from './worlds/shapes'
 export { toolsWorld }       from './worlds/tools'
 export { timeWorld }        from './worlds/time'
+export { halloweenWorld }  from './worlds/halloween'
+export { christmasWorld }  from './worlds/christmas'
+export { easterWorld }     from './worlds/easter'
 
 import { animalsWorld }    from './worlds/animals'
 import { foodWorld }       from './worlds/food'
@@ -73,6 +77,9 @@ import { planetsWorld }     from './worlds/planets'
 import { shapesWorld }      from './worlds/shapes'
 import { toolsWorld }       from './worlds/tools'
 import { timeWorld }        from './worlds/time'
+import { halloweenWorld }  from './worlds/halloween'
+import { christmasWorld }  from './worlds/christmas'
+import { easterWorld }     from './worlds/easter'
 
 export const WORLDS: World[] = [
   animalsWorld,
@@ -126,4 +133,7 @@ export const WORLD_MAP: Record<WorldId, World> = {
   shapes:       shapesWorld,
   tools:        toolsWorld,
   time:         timeWorld,
+  halloween:    halloweenWorld,
+  christmas:    christmasWorld,
+  easter:       easterWorld,
 }

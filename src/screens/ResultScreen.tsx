@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { ConfettiCanvas } from '../components/ConfettiCanvas'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '../store/gameStore'
 import { useProfileStore } from '../store/profileStore'
@@ -150,6 +151,8 @@ export function ResultScreen() {
 
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark">
+
+      {perfectBonus > 0 && <ConfettiCanvas />}
 
       {/* ── Rank-up overlay ── */}
       <AnimatePresence>

@@ -3,13 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useProfileStore } from '../store/profileStore'
 import { useGameStore, type GameMode } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
-import { WORLDS, type WorldId } from '../data/words'
+import { WORLDS, WORLD_MAP, type WorldId } from '../data/words'
 import { getRankForBerries, getNextRank, getRankProgress } from '../utils/rankHelpers'
 import { getTranslations, type Lang } from '../i18n/translations'
-import { todayString } from '../engine/rng'
+import { todayString, mulberry32, dateToSeed } from '../engine/rng'
 import { TutorialOverlay } from '../components/TutorialOverlay'
 
 const LANGS: Lang[] = ['en', 'es', 'ca']
+
+const ACTIVE_SEASON: 'halloween' | 'christmas' | 'easter' | null = (() => {
+  const m = new Date().getMonth() + 1
+  if (m === 10) return 'halloween'
+  if (m === 12 || m === 1) return 'christmas'
+  if (m === 3 || m === 4) return 'easter'
+  return null
+})()
+
+const ALL_WORDS_FOR_DAILY = WORLDS.flatMap(w => w.words.map(wd => ({ ...wd, worldEmoji: w.emoji })))
+const _dailyRng = mulberry32(dateToSeed(todayString()) ^ 0x1a2b3c)
+const TODAY_WORD = ALL_WORDS_FOR_DAILY[Math.floor(_dailyRng() * ALL_WORDS_FOR_DAILY.length)]
 
 export function HubScreen() {
   const { getActiveProfile } = useProfileStore()
@@ -18,6 +30,7 @@ export function HubScreen() {
   const t = getTranslations(language)
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [speakingToday, setSpeakingToday] = useState(false)
 
   const profile = getActiveProfile()
   if (!profile) {
@@ -32,9 +45,23 @@ export function HubScreen() {
   const dailyDone = profile.lastDailyDate === today
 
   const handleWorldSelect = (worldId: WorldId) => {
-    const world = WORLDS.find(w => w.id === worldId)!
-    if (profile.berries < world.berriesRequired) return
+    const world = WORLD_MAP[worldId]
+    if (!world || profile.berries < world.berriesRequired) return
     startRound(worldId, false)
+  }
+
+  const handleSpeakToday = () => {
+    if (speakingToday) { speechSynthesis.cancel(); setSpeakingToday(false); return }
+    const translation = learnLang === 'ca' ? TODAY_WORD.ca ?? TODAY_WORD.es : TODAY_WORD.es
+    const u1 = new SpeechSynthesisUtterance(TODAY_WORD.en)
+    u1.lang = 'en-US'
+    const u2 = new SpeechSynthesisUtterance(translation)
+    u2.lang = learnLang === 'ca' ? 'ca-ES' : 'es-ES'
+    u2.onend = () => setSpeakingToday(false)
+    setSpeakingToday(true)
+    speechSynthesis.cancel()
+    speechSynthesis.speak(u1)
+    speechSynthesis.speak(u2)
   }
 
   return (
@@ -189,7 +216,7 @@ export function HubScreen() {
         className="bg-op-ink/20 rounded-2xl border-2 border-op-gold/30 p-4 mx-4 mb-3 flex-shrink-0"
       >
         <div className="flex justify-between items-baseline mb-1">
-          <span className="font-title text-xl text-op-gold">{profile.name}</span>
+          <span className="font-title text-xl text-op-gold">{profile.avatar ?? '🏴‍☠️'} {profile.name}</span>
           <div className="flex items-center gap-3">
             {profile.dailyStreak > 0 && (
               <span className="font-title text-sm text-op-cyan">📅 ×{profile.dailyStreak}</span>
@@ -230,6 +257,44 @@ export function HubScreen() {
         {dailyDone ? '✓ DAILY DONE' : `⚡ ${t.daily}`}
       </motion.button>
 
+      {/* ── Palabra del día ── */}
+      <motion.div
+        initial={{ x: 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.15 }}
+        className="mx-4 mb-3 flex-shrink-0 bg-op-ink/20 border border-op-gold/20 rounded-xl px-4 py-2.5 flex items-center gap-3"
+      >
+        <span className="text-2xl leading-none">{TODAY_WORD.worldEmoji}</span>
+        <div className="flex-1 min-w-0">
+          <div className="font-body text-[10px] text-white/30 tracking-widest uppercase">Word of the day</div>
+          <div className="font-title text-sm leading-tight">
+            <span className="text-op-gold">{TODAY_WORD.en}</span>
+            <span className="text-white/30"> → </span>
+            <span className="text-op-cyan">{learnLang === 'ca' ? TODAY_WORD.ca ?? TODAY_WORD.es : TODAY_WORD.es}</span>
+          </div>
+        </div>
+        <button
+          onClick={handleSpeakToday}
+          className={`text-xl transition-transform ${speakingToday ? 'scale-125 text-op-cyan' : 'text-white/40 hover:text-white/70'}`}
+        >
+          {speakingToday ? '🔊' : '🔈'}
+        </button>
+      </motion.div>
+
+      {/* ── Seasonal event ── */}
+      {ACTIVE_SEASON && (
+        <motion.button
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.18, type: 'spring', stiffness: 320 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={() => handleWorldSelect(ACTIVE_SEASON)}
+          className="mx-4 mb-3 flex-shrink-0 py-3 rounded-xl border-4 border-op-gold bg-op-gold/10 text-op-gold font-title text-lg tracking-wide flex items-center justify-center gap-2 shadow-manga hover:bg-op-gold/20"
+        >
+          {WORLD_MAP[ACTIVE_SEASON].emoji} {WORLD_MAP[ACTIVE_SEASON].label} EVENT!
+        </motion.button>
+      )}
+
       {/* ── Game mode selector ── */}
       <div className="mx-4 mb-3 flex-shrink-0 flex gap-2">
         {([['normal', t.normalMode], ['survival', t.survivalMode], ['reverse', t.reverseMode]] as [GameMode, string][]).map(([mode, label]) => (
@@ -250,7 +315,7 @@ export function HubScreen() {
       {/* ── World list ── */}
       <h2 className="font-title text-base text-op-gold/80 tracking-widest px-4 mb-2 flex-shrink-0">{t.worldSelect}</h2>
       <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {WORLDS.map((world, i) => {
             const locked = profile.berries < world.berriesRequired
             const learnedKeys = (profile.wordProgress ?? {})[learnLang]?.[world.id] ?? []

@@ -8,6 +8,7 @@ import { getRankForBerries } from '../utils/rankHelpers'
 export interface Profile {
   id: string
   name: string
+  avatar?: string
   berries: number
   totalCorrect: number
   maxEverStreak: number
@@ -19,13 +20,16 @@ export interface Profile {
   wordProgress: Partial<Record<TargetLang, Partial<Record<WorldId, string[]>>>>
   wordStats: Partial<Record<TargetLang, Record<string, { c: number; w: number }>>>
   playedDates: string[]
+  bestRoundScore?: number
 }
 
 interface ProfileState {
   profiles: Profile[]
   activeProfileId: string | null
 
-  createProfile: (name: string) => void
+  createProfile: (name: string, avatar?: string) => void
+  setAvatar: (avatar: string) => void
+  updateBestRoundScore: (score: number) => void
   setActiveProfile: (id: string) => void
   deleteProfile: (id: string) => void
   getActiveProfile: () => Profile | null
@@ -65,10 +69,26 @@ export const useProfileStore = create<ProfileState>()(
       profiles: [],
       activeProfileId: null,
 
-      createProfile: (name) => {
-        const profile = createEmptyProfile(name)
+      createProfile: (name, avatar = '🏴‍☠️') => {
+        const profile = { ...createEmptyProfile(name), avatar }
         set(s => ({ profiles: [...s.profiles, profile], activeProfileId: profile.id }))
       },
+
+      setAvatar: (avatar) =>
+        set(s => ({
+          profiles: s.profiles.map(p =>
+            p.id === s.activeProfileId ? { ...p, avatar } : p
+          ),
+        })),
+
+      updateBestRoundScore: (score) =>
+        set(s => ({
+          profiles: s.profiles.map(p =>
+            p.id === s.activeProfileId && score > (p.bestRoundScore ?? 0)
+              ? { ...p, bestRoundScore: score }
+              : p
+          ),
+        })),
 
       setActiveProfile: (id) => set({ activeProfileId: id }),
 
