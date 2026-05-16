@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { soundEngine } from '../audio/SoundEngine'
 
 interface TimerRingProps {
@@ -37,7 +37,6 @@ export function TimerRing({ duration, onTimeout, running }: TimerRingProps) {
       const remaining = Math.max(0, duration - elapsed)
       setTimeLeft(remaining)
 
-      // Tick sound: once per integer second in the last 3 seconds
       const tickSec = Math.ceil(remaining)
       if (remaining <= 3 && remaining > 0 && tickSec !== lastTickSecRef.current) {
         lastTickSecRef.current = tickSec
@@ -61,31 +60,43 @@ export function TimerRing({ duration, onTimeout, running }: TimerRingProps) {
 
   const progress = timeLeft / duration
   const strokeDash = CIRC * progress
-  const isUrgent = timeLeft <= 3
+  const isUrgent = timeLeft <= 3 && timeLeft > 0
+  const secCeil = Math.ceil(timeLeft)
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 112, height: 112 }}>
+    <motion.div
+      className="relative flex items-center justify-center"
+      animate={isUrgent ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+      transition={isUrgent ? { repeat: Infinity, duration: 0.7, ease: 'easeInOut' } : { duration: 0.3 }}
+      style={{ width: 112, height: 112 }}
+    >
       <svg width="112" height="112" className="rotate-[-90deg]">
         <circle cx="56" cy="56" r={R} fill="none" stroke="#1A1A2E" strokeWidth="8" />
         <motion.circle
-          cx="56"
-          cy="56"
-          r={R}
+          cx="56" cy="56" r={R}
           fill="none"
-          stroke={isUrgent ? '#D32F2F' : '#00E5FF'}
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={CIRC}
           strokeDashoffset={CIRC - strokeDash}
-          transition={{ duration: 0.05 }}
+          animate={{ stroke: isUrgent ? '#D32F2F' : '#00E5FF' }}
+          transition={{ duration: 0.5, ease: 'easeInOut', strokeDashoffset: { duration: 0.05 } }}
         />
       </svg>
-      <span
-        className={`absolute font-title text-3xl ${isUrgent ? 'text-op-red' : 'text-op-cyan'}`}
-        style={{ lineHeight: 1 }}
-      >
-        {Math.ceil(timeLeft)}
-      </span>
-    </div>
+
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={secCeil}
+          initial={{ scale: 1.35, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.7, opacity: 0 }}
+          transition={{ duration: 0.15, type: 'spring', stiffness: 500 }}
+          className={`absolute font-title text-3xl ${isUrgent ? 'text-op-red' : 'text-op-cyan'}`}
+          style={{ lineHeight: 1 }}
+        >
+          {secCeil}
+        </motion.span>
+      </AnimatePresence>
+    </motion.div>
   )
 }

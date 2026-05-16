@@ -15,15 +15,28 @@ export function WordCard({ entry, reversed = false, learnLang = 'es' }: WordCard
   return (
     <motion.div
       key={entry.en}
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      initial={{ x: 60, opacity: 0, scale: 0.95 }}
+      animate={{ x: 0, opacity: 1, scale: 1 }}
+      exit={{ x: -60, opacity: 0, scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 360, damping: 28 }}
       className="w-full rounded-2xl bg-op-parchment border-4 border-op-ink shadow-manga p-5 text-center"
     >
-      <div className="text-5xl mb-2">{entry.icon}</div>
-      <div className="font-title text-4xl text-op-ink tracking-wider mb-2">
+      <motion.div
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.08, type: 'spring', stiffness: 500, damping: 20 }}
+        className="text-5xl mb-2"
+      >
+        {entry.icon}
+      </motion.div>
+      <motion.div
+        initial={{ y: 8, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.12, duration: 0.2 }}
+        className="font-title text-4xl text-op-ink tracking-wider mb-2"
+      >
         {displayWord}
-      </div>
+      </motion.div>
       {reversed && (
         <div className="font-body text-xs text-op-ink/50 italic mb-1 tracking-widest">→ English?</div>
       )}

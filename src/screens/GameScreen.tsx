@@ -41,6 +41,7 @@ export function GameScreen() {
   const [milestoneBanner, setMilestoneBanner] = useState<string | null>(null)
   const [milestoneColor, setMilestoneColor] = useState('text-op-gold')
   const [survivorDead, setSurvivorDead] = useState(false)
+  const [scorePop, setScorePop] = useState<{ value: number; id: number } | null>(null)
 
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shownMilestones = useRef(new Set<number>())
@@ -80,10 +81,13 @@ export function GameScreen() {
     setTimerRunning(false)
     setSelected(option)
 
+    const scoreBefore = useGameStore.getState().score
     const correct = answerQuestion(option)
     setFeedbackCorrect(correct)
 
     if (correct) {
+      const delta = useGameStore.getState().score - scoreBefore
+      if (delta > 0) setScorePop({ value: delta, id: Date.now() })
       soundEngine.playCorrect()
       vibrate(HapticPattern.correct)
       setParticleTrigger(true)
@@ -165,6 +169,22 @@ export function GameScreen() {
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark px-4 pt-5 pb-6">
       <ParticleEmitter trigger={particleTrigger} />
+
+      {/* Floating score pop */}
+      <AnimatePresence>
+        {scorePop && (
+          <motion.div
+            key={scorePop.id}
+            initial={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 0, y: -70, scale: 1.3 }}
+            transition={{ duration: 0.85, ease: 'easeOut' }}
+            onAnimationComplete={() => setScorePop(null)}
+            className="fixed top-1/3 left-1/2 -translate-x-1/2 font-title text-3xl text-op-gold pointer-events-none z-50 drop-shadow-lg"
+          >
+            +{scorePop.value}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Streak milestone banner */}
       <AnimatePresence>
