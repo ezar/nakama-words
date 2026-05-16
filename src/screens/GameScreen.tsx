@@ -46,12 +46,13 @@ export function GameScreen() {
   const shownMilestones = useRef(new Set<number>())
 
   const totalQuestions = wordQueue.length
-  const isLastQuestion = currentQuestionIndex >= totalQuestions - 1 || survivorDead
+  const doAdvance = useCallback((forcedGameOver = false) => {
+    const { currentQuestionIndex: idx, wordQueue: q, maxStreak, correctWords, score: finalScore } = useGameStore.getState()
+    const isGameOver = forcedGameOver || survivorDead
+    const isOver = idx >= q.length - 1 || isGameOver
 
-  const doAdvance = useCallback(() => {
-    if (isLastQuestion) {
-      const { maxStreak, correctWords, wordQueue: finalQueue, score: finalScore } = useGameStore.getState()
-      const perfectBonus = !survivorDead && correctWords.length === finalQueue.length ? PERFECT_BONUS : 0
+    if (isOver) {
+      const perfectBonus = !isGameOver && correctWords.length === q.length ? PERFECT_BONUS : 0
       updateMaxStreak(maxStreak)
       addCorrect(correctWords.length)
       if (isDaily) completeDaily(todayString())
@@ -64,7 +65,7 @@ export function GameScreen() {
       recordWordStats(ll, correctWords.map(w => w.en), wrongWords.map(w => w.en))
       recordPlayedDate(todayString())
       const berriesResult = addBerries(finalScore + perfectBonus)
-      finishRound({ ...berriesResult, perfectBonus, gameOver: survivorDead })
+      finishRound({ ...berriesResult, perfectBonus, gameOver: isGameOver })
     } else {
       advanceQuestion()
       setSelected(null)
@@ -72,7 +73,7 @@ export function GameScreen() {
       setTimerKey(k => k + 1)
       setTimerRunning(true)
     }
-  }, [isLastQuestion, survivorDead, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, isDaily, completeDaily, currentWorldId, markWordsLearned, recordWordStats, recordPlayedDate])
+  }, [survivorDead, advanceQuestion, finishRound, addBerries, addCorrect, updateMaxStreak, isDaily, completeDaily, currentWorldId, markWordsLearned, recordWordStats, recordPlayedDate])
 
   const handleSelect = useCallback((option: string) => {
     if (selected !== null) return
@@ -104,11 +105,15 @@ export function GameScreen() {
       vibrate(HapticPattern.wrong)
       if (gameMode === 'survival') {
         const dead = loseLife()
-        if (dead) setSurvivorDead(true)
+        if (dead) {
+          setSurvivorDead(true)
+          advanceTimer.current = setTimeout(() => doAdvance(true), ADVANCE_DELAY)
+          return
+        }
       }
     }
 
-    advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
+    advanceTimer.current = setTimeout(() => doAdvance(), ADVANCE_DELAY)
   }, [selected, answerQuestion, loseLife, gameMode, doAdvance])
 
   const handleTimeout = useCallback(() => {
@@ -121,9 +126,13 @@ export function GameScreen() {
     vibrate(HapticPattern.wrong)
     if (gameMode === 'survival') {
       const dead = loseLife()
-      if (dead) setSurvivorDead(true)
+      if (dead) {
+        setSurvivorDead(true)
+        advanceTimer.current = setTimeout(() => doAdvance(true), ADVANCE_DELAY)
+        return
+      }
     }
-    advanceTimer.current = setTimeout(doAdvance, ADVANCE_DELAY)
+    advanceTimer.current = setTimeout(() => doAdvance(), ADVANCE_DELAY)
   }, [selected, answerQuestion, loseLife, gameMode, doAdvance])
 
   // Keyboard 1–4
