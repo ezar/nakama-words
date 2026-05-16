@@ -128,7 +128,7 @@ export function HubScreen() {
                           <span className="flex items-center gap-1.5">
                             <span
                               className="inline-block w-4 h-3 rounded-sm flex-shrink-0 border border-white/20"
-                              style={{ background: 'repeating-linear-gradient(to bottom,#FCDD09 0,#FCDD09 33%,#C1000B 33%,#C1000B 66%,#FCDD09 66%,#FCDD09 100%)' }}
+                              style={{ background: 'linear-gradient(to bottom,#FCDD09 0%,#FCDD09 11.1%,#C1000B 11.1%,#C1000B 22.2%,#FCDD09 22.2%,#FCDD09 33.3%,#C1000B 33.3%,#C1000B 44.4%,#FCDD09 44.4%,#FCDD09 55.5%,#C1000B 55.5%,#C1000B 66.6%,#FCDD09 66.6%,#FCDD09 77.7%,#C1000B 77.7%,#C1000B 88.8%,#FCDD09 88.8%,#FCDD09 100%)' }}
                             />
                             CA
                           </span>
