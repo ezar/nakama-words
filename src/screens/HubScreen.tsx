@@ -10,6 +10,7 @@ import { todayString, mulberry32, dateToSeed } from '../engine/rng'
 import { TutorialOverlay } from '../components/TutorialOverlay'
 
 const LANGS: Lang[] = ['en', 'es', 'ca']
+const PIRATE_AVATARS = ['🏴‍☠️', '☠️', '🦜', '⚓', '💎', '🧭', '🐚', '🐙']
 
 const ACTIVE_SEASON: 'halloween' | 'christmas' | 'easter' | null = (() => {
   const m = new Date().getMonth() + 1
@@ -24,7 +25,7 @@ const _dailyRng = mulberry32(dateToSeed(todayString()) ^ 0x1a2b3c)
 const TODAY_WORD = ALL_WORDS_FOR_DAILY[Math.floor(_dailyRng() * ALL_WORDS_FOR_DAILY.length)]
 
 export function HubScreen() {
-  const { getActiveProfile } = useProfileStore()
+  const { getActiveProfile, setAvatar } = useProfileStore()
   const { setPhase, startRound, gameMode, setGameMode } = useGameStore()
   const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang, tutorialSeen, setTutorialSeen } = useSettingsStore()
   const t = getTranslations(language)
@@ -89,7 +90,7 @@ export function HubScreen() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 380, damping: 36 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d2d4a] border-t-4 border-op-gold/40 rounded-t-3xl px-6 pb-8 pt-5 md:w-[500px] md:mx-auto"
+              className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d2d4a] border-t-4 border-op-gold/40 rounded-t-3xl px-6 pb-8 pt-5 sm:w-[500px] sm:mx-auto md:w-[700px]"
             >
               {/* Handle */}
               <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5" />
@@ -97,6 +98,26 @@ export function HubScreen() {
               <h2 className="font-title text-2xl text-op-gold mb-5">⚙️ {t.settings}</h2>
 
               <div className="flex flex-col gap-4">
+
+                {/* Avatar */}
+                <div className="flex items-center justify-between py-3 border-b border-white/8">
+                  <span className="font-body text-base text-white/70">Avatar</span>
+                  <div className="flex gap-1.5">
+                    {PIRATE_AVATARS.map(av => (
+                      <button
+                        key={av}
+                        onClick={() => setAvatar(av)}
+                        className={`text-lg px-1 py-0.5 rounded-lg border-2 transition-colors ${
+                          (profile.avatar ?? '🏴‍☠️') === av
+                            ? 'border-op-gold bg-op-gold/20'
+                            : 'border-white/10 hover:border-white/30'
+                        }`}
+                      >
+                        {av}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Sound */}
                 <div className="flex items-center justify-between py-3 border-b border-white/8">
@@ -282,18 +303,32 @@ export function HubScreen() {
       </motion.div>
 
       {/* ── Seasonal event ── */}
-      {ACTIVE_SEASON && (
-        <motion.button
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.18, type: 'spring', stiffness: 320 }}
-          whileTap={{ scale: 0.96 }}
-          onClick={() => handleWorldSelect(ACTIVE_SEASON)}
-          className="mx-4 mb-3 flex-shrink-0 py-3 rounded-xl border-4 border-op-gold bg-op-gold/10 text-op-gold font-title text-lg tracking-wide flex items-center justify-center gap-2 shadow-manga hover:bg-op-gold/20"
-        >
-          {WORLD_MAP[ACTIVE_SEASON].emoji} {WORLD_MAP[ACTIVE_SEASON].label} EVENT!
-        </motion.button>
-      )}
+      {ACTIVE_SEASON && (() => {
+        const sw = WORLD_MAP[ACTIVE_SEASON]
+        const swLearned = ((profile.wordProgress ?? {})[learnLang]?.[ACTIVE_SEASON] ?? []).length
+        const swTotal = sw.words.length
+        const swMastered = swLearned >= swTotal
+        return (
+          <motion.button
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.18, type: 'spring', stiffness: 320 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => handleWorldSelect(ACTIVE_SEASON)}
+            className="mx-4 mb-3 flex-shrink-0 rounded-xl border-4 border-op-gold bg-op-gold/10 text-op-gold shadow-manga hover:bg-op-gold/20 overflow-hidden"
+          >
+            <div className="py-3 flex items-center justify-center gap-2 font-title text-lg tracking-wide">
+              {sw.emoji} {sw.label} EVENT!
+              <span className="font-body text-xs opacity-60">{swMastered ? '✓' : `${swLearned}/${swTotal}`}</span>
+            </div>
+            {!swMastered && swLearned > 0 && (
+              <div className="h-1 bg-op-gold/10">
+                <div className="h-full bg-op-gold/60 transition-all" style={{ width: `${(swLearned / swTotal) * 100}%` }} />
+              </div>
+            )}
+          </motion.button>
+        )
+      })()}
 
       {/* ── Game mode selector ── */}
       <div className="mx-4 mb-3 flex-shrink-0 flex gap-2">
