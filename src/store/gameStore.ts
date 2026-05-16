@@ -140,9 +140,19 @@ export const useGameStore = create<GameState>()((set, get) => ({
   advanceQuestion: () => {
     const { currentQuestionIndex, wordQueue, currentWorldId, isDaily, gameMode } = get()
     const nextIndex = currentQuestionIndex + 1
-    if (nextIndex >= wordQueue.length || !currentWorldId) return
+    if (!currentWorldId) return
 
-    const nextEntry = wordQueue[nextIndex]!
+    let queue = wordQueue
+    if (nextIndex >= wordQueue.length) {
+      if (gameMode !== 'survival') return
+      // survival: auto-extend with another shuffled batch
+      const world = WORLD_MAP[currentWorldId]
+      const moreWords = buildRound(world, Math.random)
+      queue = [...wordQueue, ...moreWords]
+      set({ wordQueue: queue })
+    }
+
+    const nextEntry = queue[nextIndex]!
     const world = isDaily ? findWorldForEntry(nextEntry) : WORLD_MAP[currentWorldId]
     const learnLang = useSettingsStore.getState().learnLang
     const reversed = gameMode === 'reverse'

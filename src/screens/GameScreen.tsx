@@ -47,9 +47,9 @@ export function GameScreen() {
 
   const totalQuestions = wordQueue.length
   const doAdvance = useCallback((forcedGameOver = false) => {
-    const { currentQuestionIndex: idx, wordQueue: q, maxStreak, correctWords, score: finalScore } = useGameStore.getState()
+    const { currentQuestionIndex: idx, wordQueue: q, maxStreak, correctWords, score: finalScore, gameMode } = useGameStore.getState()
     const isGameOver = forcedGameOver || survivorDead
-    const isOver = idx >= q.length - 1 || isGameOver
+    const isOver = isGameOver || (idx >= q.length - 1 && gameMode !== 'survival')
 
     if (isOver) {
       const perfectBonus = !isGameOver && correctWords.length === q.length ? PERFECT_BONUS : 0
@@ -223,25 +223,33 @@ export function GameScreen() {
         </motion.div>
       </div>
 
-      {/* ── PROGRESS DOTS ── */}
-      <div className="flex gap-1.5 justify-center mb-3 flex-shrink-0">
-        {Array.from({ length: totalQuestions }).map((_, i) => {
-          const done    = i < answeredCount
-          const current = i === currentQuestionIndex && selected === null
-          return (
-            <motion.div
-              key={i}
-              animate={current ? { scale: [1, 1.4, 1] } : {}}
-              transition={{ repeat: Infinity, duration: 1.2 }}
-              className={`rounded-full transition-all duration-300 ${
-                done    ? 'w-2.5 h-2.5 bg-op-green' :
-                current ? 'w-2.5 h-2.5 bg-op-gold' :
-                          'w-2 h-2 bg-white/20'
-              }`}
-            />
-          )
-        })}
-      </div>
+      {/* ── PROGRESS DOTS / SURVIVAL COUNTER ── */}
+      {isSurvival ? (
+        <div className="flex justify-center mb-3 flex-shrink-0">
+          <span className="font-title text-op-gold/60 text-sm tracking-widest">
+            Q{answeredCount}
+          </span>
+        </div>
+      ) : (
+        <div className="flex gap-1.5 justify-center mb-3 flex-shrink-0">
+          {Array.from({ length: totalQuestions }).map((_, i) => {
+            const done    = i < answeredCount
+            const current = i === currentQuestionIndex && selected === null
+            return (
+              <motion.div
+                key={i}
+                animate={current ? { scale: [1, 1.4, 1] } : {}}
+                transition={{ repeat: Infinity, duration: 1.2 }}
+                className={`rounded-full transition-all duration-300 ${
+                  done    ? 'w-2.5 h-2.5 bg-op-green' :
+                  current ? 'w-2.5 h-2.5 bg-op-gold' :
+                            'w-2 h-2 bg-white/20'
+                }`}
+              />
+            )
+          })}
+        </div>
+      )}
 
       {/* ── MIDDLE: card + timer/feedback ── */}
       <div className="flex-1 flex flex-col justify-center gap-4 min-h-0">
