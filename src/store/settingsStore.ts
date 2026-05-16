@@ -8,9 +8,11 @@ interface SettingsState {
   soundEnabled: boolean
   language: Lang
   learnLang: TargetLang
+  tutorialSeen: boolean
   toggleSound: () => void
   setLanguage: (lang: Lang) => void
   setLearnLang: (lang: TargetLang) => void
+  setTutorialSeen: () => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -19,6 +21,7 @@ export const useSettingsStore = create<SettingsState>()(
       soundEnabled: true,
       language: detectLanguage(),
       learnLang: 'es',
+      tutorialSeen: false,
       toggleSound: () =>
         set(s => {
           const next = !s.soundEnabled
@@ -27,6 +30,7 @@ export const useSettingsStore = create<SettingsState>()(
         }),
       setLanguage: (language) => set({ language }),
       setLearnLang: (learnLang) => set({ learnLang }),
+      setTutorialSeen: () => set({ tutorialSeen: true }),
     }),
     { name: 'ph-settings' },
   ),

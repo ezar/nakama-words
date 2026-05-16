@@ -14,6 +14,21 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: { cacheName: 'google-fonts-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: { cacheName: 'gstatic-fonts-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+        ],
+      },
       manifest: {
         name: 'Palabra Hunter',
         short_name: 'Palabra Hunter',
@@ -22,7 +37,20 @@ export default defineConfig({
         background_color: '#0a2240',
         display: 'standalone',
         orientation: 'portrait',
-        icons: [{ src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml' }],
+        start_url: '/nakama-words/',
+        scope: '/nakama-words/',
+        icons: [
+          { src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
+        ],
+        shortcuts: [
+          {
+            name: 'Daily Challenge',
+            short_name: 'Daily',
+            description: 'Play today\'s daily challenge',
+            url: '/nakama-words/',
+            icons: [{ src: 'favicon.svg', sizes: 'any' }],
+          },
+        ],
       },
     }),
   ],

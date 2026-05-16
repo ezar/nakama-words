@@ -7,13 +7,14 @@ import { WORLDS, type WorldId } from '../data/words'
 import { getRankForBerries, getNextRank, getRankProgress } from '../utils/rankHelpers'
 import { getTranslations, type Lang } from '../i18n/translations'
 import { todayString } from '../engine/rng'
+import { TutorialOverlay } from '../components/TutorialOverlay'
 
 const LANGS: Lang[] = ['en', 'es', 'ca']
 
 export function HubScreen() {
   const { getActiveProfile } = useProfileStore()
   const { setPhase, startRound, gameMode, setGameMode } = useGameStore()
-  const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang } = useSettingsStore()
+  const { language, setLanguage, toggleSound, soundEnabled, learnLang, setLearnLang, tutorialSeen, setTutorialSeen } = useSettingsStore()
   const t = getTranslations(language)
 
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -38,6 +39,10 @@ export function HubScreen() {
 
   return (
     <div className="flex flex-col h-full bg-op-ocean-dark">
+
+      <AnimatePresence>
+        {!tutorialSeen && <TutorialOverlay onDone={setTutorialSeen} />}
+      </AnimatePresence>
 
       {/* ── Settings bottom sheet ── */}
       <AnimatePresence>
@@ -203,7 +208,7 @@ export function HubScreen() {
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        onClick={dailyDone ? undefined : () => startRound('animals', true)}
+        onClick={dailyDone ? undefined : () => startRound('daily' as WorldId, true)}
         disabled={dailyDone}
         className={`
           mx-4 mb-3 py-3.5 rounded-xl border-4 font-title text-xl tracking-wide flex-shrink-0

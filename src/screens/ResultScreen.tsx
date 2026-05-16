@@ -26,12 +26,85 @@ export function ResultScreen() {
   const handleShare = async () => {
     const profile = getActiveProfile()
     const name = profile?.name ?? 'Pirate'
-    const text = `🏴‍☠️ ${name} — Palabra Hunter\n⭐ ${correctWords.length}/${totalQuestions} correct\n🍇 ${berriesEarned} berries earned\n🔥 Best streak: ${maxStreak}${gameOver ? '\n💀 SURVIVAL: fought until the end!' : ''}`
-    if (navigator.share) {
-      await navigator.share({ title: 'Palabra Hunter', text }).catch(() => null)
-    } else {
-      await navigator.clipboard.writeText(text).catch(() => null)
+
+    const canvas = document.createElement('canvas')
+    const W = 800, H = 520
+    canvas.width = W; canvas.height = H
+    const ctx = canvas.getContext('2d')!
+
+    function rr(x: number, y: number, w: number, h: number, r: number) {
+      ctx.beginPath()
+      ctx.moveTo(x + r, y)
+      ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r)
+      ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+      ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r)
+      ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r)
+      ctx.closePath()
     }
+
+    ctx.fillStyle = '#0a2240'; ctx.fillRect(0, 0, W, H)
+    ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 6
+    rr(8, 8, W - 16, H - 16, 24); ctx.stroke()
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; rr(16, 16, W - 32, H - 32, 20); ctx.fill()
+
+    ctx.textAlign = 'center'
+    ctx.font = '64px serif'; ctx.fillText(gameOver ? '💀' : perfectBonus > 0 ? '🌟' : '🏴‍☠️', W / 2, 80)
+    ctx.font = 'bold 32px Georgia,serif'; ctx.fillStyle = '#f5c518'; ctx.fillText('PALABRA HUNTER', W / 2, 122)
+    ctx.font = '20px Arial,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillText(name, W / 2, 150)
+
+    const stars = Math.round((correctWords.length / Math.max(totalQuestions, 1)) * 3)
+    ctx.font = '32px serif'; ctx.fillStyle = '#f5c518'
+    ctx.fillText('★'.repeat(stars) + '☆'.repeat(3 - stars), W / 2, 192)
+
+    const stats = [
+      { v: String(score), l: 'SCORE', c: '#ffffff' },
+      { v: `🍇 ${berriesEarned}`, l: 'BERRIES', c: '#f5c518' },
+      { v: `🔥 ${maxStreak}`, l: 'STREAK', c: '#2dd4bf' },
+    ]
+    stats.forEach(({ v, l, c }, i) => {
+      const bx = 60 + i * 240, by = 210
+      ctx.fillStyle = 'rgba(255,255,255,0.06)'; rr(bx, by, 200, 80, 14); ctx.fill()
+      ctx.font = 'bold 28px Georgia,serif'; ctx.fillStyle = c; ctx.fillText(v, bx + 100, by + 38)
+      ctx.font = '15px Arial,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillText(l, bx + 100, by + 62)
+    })
+
+    const bw = W - 80, bx = 40, by = 308, bh = 22
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'; rr(bx, by, bw, bh, 11); ctx.fill()
+    const cw = (correctWords.length / Math.max(totalQuestions, 1)) * bw
+    if (cw > 0) { ctx.fillStyle = '#4ade80'; rr(bx, by, cw, bh, 11); ctx.fill() }
+    ctx.font = 'bold 14px Arial'; ctx.fillStyle = '#0a2240'
+    if (correctWords.length > 0) ctx.fillText(`✓ ${correctWords.length}`, bx + cw / 2, by + 16)
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+    if (wrongWords.length > 0) ctx.fillText(`✗ ${wrongWords.length}`, bx + cw + (bw - cw) / 2, by + 16)
+
+    ctx.textAlign = 'left'
+    correctWords.slice(0, 6).forEach((w, i) => {
+      const col = i % 3, row = Math.floor(i / 3)
+      const wx = 44 + col * 250, wy = 348 + row * 60
+      ctx.fillStyle = 'rgba(74,222,128,0.08)'; rr(wx - 4, wy - 24, 234, 50, 10); ctx.fill()
+      ctx.font = '22px serif'; ctx.fillText(w.icon, wx, wy)
+      ctx.font = 'bold 18px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fillText(w.en, wx + 30, wy)
+      ctx.font = '14px Arial'; ctx.fillStyle = '#4ade80'; ctx.fillText(`→ ${w[learnLang] ?? w.es}`, wx + 30, wy + 20)
+    })
+
+    ctx.textAlign = 'center'; ctx.font = '14px Arial'
+    ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillText(new Date().toLocaleDateString(), W / 2, H - 16)
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+      const file = new File([blob], 'palabra-hunter.png', { type: 'image/png' })
+      const fallbackText = `🏴‍☠️ ${name} — Palabra Hunter\n⭐ ${correctWords.length}/${totalQuestions} correct · 🍇 ${berriesEarned} · 🔥 ${maxStreak}`
+      const shareData = { title: 'Palabra Hunter', text: fallbackText, files: [file] }
+      if (navigator.canShare?.(shareData)) {
+        await navigator.share(shareData).catch(() => null)
+      } else if (navigator.share) {
+        await navigator.share({ title: 'Palabra Hunter', text: fallbackText }).catch(() => null)
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a'); a.href = url; a.download = 'palabra-hunter.png'; a.click()
+        URL.revokeObjectURL(url)
+      }
+    }, 'image/png')
   }
 
   return (

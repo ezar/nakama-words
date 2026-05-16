@@ -254,6 +254,14 @@ export function GameScreen() {
       {/* ── MIDDLE: card + timer/feedback ── */}
       <div className="flex-1 flex flex-col justify-center gap-4 min-h-0">
 
+        {isReverse && (
+          <div className="flex justify-center">
+            <span className="font-title text-xs bg-op-cyan/15 border border-op-cyan/40 text-op-cyan px-4 py-1.5 rounded-full tracking-widest">
+              🔄 Pick the English word
+            </span>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           <WordCard
             key={currentQuestionIndex}
@@ -319,8 +327,7 @@ export function GameScreen() {
           disabled={selected !== null}
         />
         <div className="text-center font-body text-xs text-white/20 tracking-widest">
-          {currentWorldId?.toUpperCase()}
-          {isDaily ? ' · DAILY ×3' : ''}
+          {isDaily ? 'DAILY ×3' : currentWorldId?.toUpperCase()}
           {isSurvival ? ' · ❤️ SURVIVAL' : ''}
           {isReverse ? ' · 🔄 REVERSE' : ''}
         </div>
