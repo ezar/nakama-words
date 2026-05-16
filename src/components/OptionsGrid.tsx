@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 
-type OptionState = 'idle' | 'correct' | 'wrong' | 'reveal'
+type OptionState = 'idle' | 'correct-hit' | 'correct-show' | 'wrong' | 'reveal'
 
 interface OptionsGridProps {
   options: string[]
@@ -16,33 +16,39 @@ function getOptionState(
   correctAnswer: string,
 ): OptionState {
   if (selected === null) return 'idle'
-  if (option === correctAnswer) return 'correct'
+  if (option === selected && option === correctAnswer) return 'correct-hit'
+  if (option === correctAnswer) return 'correct-show'
   if (option === selected) return 'wrong'
   return 'reveal'
 }
 
 const stateStyles: Record<OptionState, string> = {
-  idle:    'bg-[#0d2d4a] border-op-cyan text-op-cyan cursor-pointer',
-  correct: 'bg-op-green/20 border-op-green text-op-green',
-  wrong:   'bg-op-red/20 border-op-red text-white',
-  reveal:  'bg-[#0d2d4a]/40 border-white/10 text-white/25',
+  'idle':          'bg-[#0d2d4a] border-op-cyan text-op-cyan cursor-pointer',
+  'correct-hit':   'bg-op-green/20 border-op-green text-op-green',
+  'correct-show':  'bg-op-green/10 border-op-green/50 text-op-green/75',
+  'wrong':         'bg-op-red/20 border-op-red text-white',
+  'reveal':        'bg-[#0d2d4a]/40 border-white/10 text-white/25',
 }
 
-const KEY_LABELS = ['1', '2', '3', '4']
-
 function getAnimate(state: OptionState) {
-  if (state === 'wrong')   return { x: [0, -12, 12, -9, 9, -5, 5, 0], scale: 1, opacity: 1 }
-  if (state === 'correct') return { scale: [1, 1.07, 0.97, 1.02, 1], opacity: 1, x: 0 }
-  if (state === 'reveal')  return { scale: 0.96, opacity: 0.3, x: 0 }
+  // Only the user's correct pick gets the celebratory bounce.
+  // correct-show (answer revealed after a miss) just fades to green — no bounce hint.
+  if (state === 'wrong')        return { x: [0, -12, 12, -9, 9, -5, 5, 0], scale: 1, opacity: 1 }
+  if (state === 'correct-hit')  return { scale: [1, 1.07, 0.97, 1.02, 1], opacity: 1, x: 0 }
+  if (state === 'correct-show') return { scale: 1, opacity: 1, x: 0 }
+  if (state === 'reveal')       return { scale: 0.96, opacity: 0.3, x: 0 }
   return { scale: 1, opacity: 1, x: 0 }
 }
 
 function getTransition(state: OptionState, i: number) {
-  if (state === 'wrong')   return { duration: 0.45, ease: 'easeInOut' }
-  if (state === 'correct') return { duration: 0.4, type: 'spring' as const, stiffness: 500, damping: 18 }
-  if (state === 'reveal')  return { duration: 0.2 }
+  if (state === 'wrong')        return { duration: 0.45, ease: 'easeInOut' }
+  if (state === 'correct-hit')  return { duration: 0.4, type: 'spring' as const, stiffness: 500, damping: 18 }
+  if (state === 'correct-show') return { duration: 0.25 }
+  if (state === 'reveal')       return { duration: 0.2 }
   return { delay: i * 0.05, type: 'spring' as const, stiffness: 360, damping: 22 }
 }
+
+const KEY_LABELS = ['1', '2', '3', '4']
 
 export function OptionsGrid({ options, correctAnswer, selected, onSelect, disabled }: OptionsGridProps) {
   return (
@@ -62,7 +68,7 @@ export function OptionsGrid({ options, correctAnswer, selected, onSelect, disabl
             className={`
               relative font-title text-2xl tracking-wide
               rounded-2xl border-4 py-5 px-3
-              transition-colors duration-150
+              transition-colors duration-200
               ${stateStyles[state]}
             `}
             aria-label={`Option ${i + 1}: ${option}`}
@@ -72,11 +78,21 @@ export function OptionsGrid({ options, correctAnswer, selected, onSelect, disabl
             </span>
 
             <AnimatePresence>
-              {state === 'correct' && (
+              {state === 'correct-hit' && (
                 <motion.span
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="absolute top-1.5 right-2.5 text-op-green text-sm"
+                >
+                  ✓
+                </motion.span>
+              )}
+              {state === 'correct-show' && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.15 }}
+                  className="absolute top-1.5 right-2.5 text-op-green/60 text-sm"
                 >
                   ✓
                 </motion.span>
