@@ -27,8 +27,15 @@ export function ResultScreen() {
     const profile = getActiveProfile()
     const name = profile?.name ?? 'Pirate'
 
+    // Load Bangers font into canvas context
+    try {
+      const f = new FontFace('Bangers', 'url(https://fonts.gstatic.com/s/bangers/v24/FeVQS0BTqb0h60ALNw.woff2)')
+      await f.load()
+      document.fonts.add(f)
+    } catch { /* fallback to serif */ }
+
+    const W = 800, H = 800
     const canvas = document.createElement('canvas')
-    const W = 800, H = 520
     canvas.width = W; canvas.height = H
     const ctx = canvas.getContext('2d')!
 
@@ -42,53 +49,87 @@ export function ResultScreen() {
       ctx.closePath()
     }
 
-    ctx.fillStyle = '#0a2240'; ctx.fillRect(0, 0, W, H)
-    ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 6
-    rr(8, 8, W - 16, H - 16, 24); ctx.stroke()
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; rr(16, 16, W - 32, H - 32, 20); ctx.fill()
+    // Background gradient
+    const bg = ctx.createLinearGradient(0, 0, 0, H)
+    bg.addColorStop(0, '#0d2d4a')
+    bg.addColorStop(1, '#0a2240')
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
+
+    // Subtle dot grid
+    ctx.fillStyle = 'rgba(255,255,255,0.025)'
+    for (let x = 30; x < W; x += 40) for (let y = 30; y < H; y += 40) { ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2); ctx.fill() }
+
+    // Gold border with glow
+    ctx.shadowColor = '#f5c518'; ctx.shadowBlur = 16
+    ctx.strokeStyle = '#f5c518'; ctx.lineWidth = 5
+    rr(10, 10, W - 20, H - 20, 28); ctx.stroke()
+    ctx.shadowBlur = 0
 
     ctx.textAlign = 'center'
-    ctx.font = '64px serif'; ctx.fillText(gameOver ? '💀' : perfectBonus > 0 ? '🌟' : '🏴‍☠️', W / 2, 80)
-    ctx.font = 'bold 32px Georgia,serif'; ctx.fillStyle = '#f5c518'; ctx.fillText('PALABRA HUNTER', W / 2, 122)
-    ctx.font = '20px Arial,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillText(name, W / 2, 150)
 
+    // Main emoji
+    ctx.font = '80px serif'
+    ctx.fillText(gameOver ? '💀' : perfectBonus > 0 ? '🌟' : '🏴‍☠️', W / 2, 110)
+
+    // Title — Bangers font
+    ctx.font = '64px Bangers, serif'; ctx.fillStyle = '#f5c518'
+    ctx.letterSpacing = '6px'
+    ctx.fillText('PALABRA HUNTER', W / 2, 178)
+    ctx.letterSpacing = '0px'
+
+    // Player name
+    ctx.font = '28px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)'
+    ctx.fillText(name.toUpperCase(), W / 2, 215)
+
+    // Divider
+    ctx.strokeStyle = 'rgba(245,197,24,0.25)'; ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(80, 232); ctx.lineTo(W - 80, 232); ctx.stroke()
+
+    // Stars
     const stars = Math.round((correctWords.length / Math.max(totalQuestions, 1)) * 3)
-    ctx.font = '32px serif'; ctx.fillStyle = '#f5c518'
-    ctx.fillText('★'.repeat(stars) + '☆'.repeat(3 - stars), W / 2, 192)
+    ctx.font = '48px serif'; ctx.fillStyle = '#f5c518'
+    ctx.fillText('★'.repeat(stars) + '☆'.repeat(3 - stars), W / 2, 290)
 
+    // Stat boxes
     const stats = [
-      { v: String(score), l: 'SCORE', c: '#ffffff' },
-      { v: `🍇 ${berriesEarned}`, l: 'BERRIES', c: '#f5c518' },
-      { v: `🔥 ${maxStreak}`, l: 'STREAK', c: '#2dd4bf' },
+      { v: String(score),            l: 'SCORE',   c: '#ffffff' },
+      { v: `🍇 ${berriesEarned}`,    l: 'BERRIES', c: '#f5c518' },
+      { v: `🔥 ${maxStreak}`,        l: 'STREAK',  c: '#2dd4bf' },
     ]
     stats.forEach(({ v, l, c }, i) => {
-      const bx = 60 + i * 240, by = 210
-      ctx.fillStyle = 'rgba(255,255,255,0.06)'; rr(bx, by, 200, 80, 14); ctx.fill()
-      ctx.font = 'bold 28px Georgia,serif'; ctx.fillStyle = c; ctx.fillText(v, bx + 100, by + 38)
-      ctx.font = '15px Arial,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillText(l, bx + 100, by + 62)
+      const bx = 44 + i * 244, by = 312
+      ctx.fillStyle = 'rgba(255,255,255,0.06)'; rr(bx, by, 218, 96, 16); ctx.fill()
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1; rr(bx, by, 218, 96, 16); ctx.stroke()
+      ctx.font = '36px Bangers, serif'; ctx.fillStyle = c; ctx.fillText(v, bx + 109, by + 46)
+      ctx.font = '16px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillText(l, bx + 109, by + 72)
     })
 
-    const bw = W - 80, bx = 40, by = 308, bh = 22
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'; rr(bx, by, bw, bh, 11); ctx.fill()
+    // Correct/wrong bar
+    const bw = W - 80, barX = 40, barY = 428, barH = 28
+    ctx.fillStyle = 'rgba(255,255,255,0.06)'; rr(barX, barY, bw, barH, 14); ctx.fill()
     const cw = (correctWords.length / Math.max(totalQuestions, 1)) * bw
-    if (cw > 0) { ctx.fillStyle = '#4ade80'; rr(bx, by, cw, bh, 11); ctx.fill() }
-    ctx.font = 'bold 14px Arial'; ctx.fillStyle = '#0a2240'
-    if (correctWords.length > 0) ctx.fillText(`✓ ${correctWords.length}`, bx + cw / 2, by + 16)
-    ctx.fillStyle = 'rgba(255,255,255,0.6)'
-    if (wrongWords.length > 0) ctx.fillText(`✗ ${wrongWords.length}`, bx + cw + (bw - cw) / 2, by + 16)
+    if (cw > 2) { ctx.fillStyle = '#4ade80'; rr(barX, barY, cw, barH, 14); ctx.fill() }
+    ctx.font = 'bold 15px Arial'; ctx.fillStyle = '#052010'
+    if (correctWords.length > 0) ctx.fillText(`✓ ${correctWords.length}`, barX + Math.min(cw / 2, cw - 10), barY + 19)
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
+    if (wrongWords.length > 0) ctx.fillText(`✗ ${wrongWords.length}`, barX + cw + (bw - cw) / 2, barY + 19)
 
+    // Word grid — 2 columns
     ctx.textAlign = 'left'
-    correctWords.slice(0, 6).forEach((w, i) => {
-      const col = i % 3, row = Math.floor(i / 3)
-      const wx = 44 + col * 250, wy = 348 + row * 60
-      ctx.fillStyle = 'rgba(74,222,128,0.08)'; rr(wx - 4, wy - 24, 234, 50, 10); ctx.fill()
-      ctx.font = '22px serif'; ctx.fillText(w.icon, wx, wy)
-      ctx.font = 'bold 18px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fillText(w.en, wx + 30, wy)
-      ctx.font = '14px Arial'; ctx.fillStyle = '#4ade80'; ctx.fillText(`→ ${w[learnLang] ?? w.es}`, wx + 30, wy + 20)
+    const shown = correctWords.slice(0, 8)
+    shown.forEach((w, i) => {
+      const col = i % 2, row = Math.floor(i / 2)
+      const wx = 44 + col * 368, wy = 482 + row * 66
+      ctx.fillStyle = 'rgba(74,222,128,0.07)'; rr(wx - 6, wy - 28, 352, 58, 12); ctx.fill()
+      ctx.font = '26px serif'; ctx.fillText(w.icon, wx, wy)
+      ctx.font = 'bold 20px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)'; ctx.fillText(w.en, wx + 36, wy)
+      ctx.font = '16px Arial, sans-serif'; ctx.fillStyle = '#4ade80'; ctx.fillText(`→ ${w[learnLang] ?? w.es}`, wx + 36, wy + 22)
     })
 
-    ctx.textAlign = 'center'; ctx.font = '14px Arial'
-    ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillText(new Date().toLocaleDateString(), W / 2, H - 16)
+    // Footer
+    ctx.textAlign = 'center'
+    ctx.font = '15px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.18)'
+    ctx.fillText(`palabrahunter.app · ${new Date().toLocaleDateString()}`, W / 2, H - 20)
 
     canvas.toBlob(async (blob) => {
       if (!blob) return
